@@ -6,11 +6,20 @@
         "libs/*"
     ],
     "scripts": {
+        "prepare": "husky",
         "build": "npm run build:front & npm run build:back",
         "build:front": "npm --workspace=apps/frontend run build",
         "build:back": "npm --workspace=apps/backend run build",
         "start": "npm run start:front & npm run start:back",
         "start:front": "npm --workspace=apps/frontend run start",
-        "start:back": "npm --workspace=apps/backend run start"
+        "start:back": "npm --workspace=apps/backend run start",
+        "test:back": "npm run test:back:unit & npm run test:back:e2e",
+        "test:back:unit": "npm --workspace=apps/backend run test",
+        "test:back:e2e": "npm --workspace=apps/backend run test:e2e",
+        "lint:back": "npm --workspace=apps/backend run lint",
+        "format:back": "npm --workspace=apps/backend run format"
+    },
+    "dependencies": {
+        "husky": "^9.1.7"
     }
 }
