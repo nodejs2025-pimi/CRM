@@ -1,12 +1,5 @@
 node_modules/
 
-dist/
-apps/*/dist/
-apps/*/dist
-apps/*/tmp
-apps/*/out-tsc
-apps/*/bazel-out
-
 .env
 
 .vscode/
