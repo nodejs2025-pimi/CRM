@@ -1,0 +1,16 @@
+{
+    "name": "monorepo-crm",
+    "author": "nodejs2025-pimi",
+    "workspaces": [
+        "apps/*",
+        "libs/*"
+    ],
+    "scripts": {
+        "build": "npm run build:front & npm run build:back",
+        "build:front": "npm --workspace=apps/frontend run build",
+        "build:back": "npm --workspace=apps/backend run build",
+        "start": "npm run start:front & npm run start:back",
+        "start:front": "npm --workspace=apps/frontend run start",
+        "start:back": "npm --workspace=apps/backend run start"
+    }
+}

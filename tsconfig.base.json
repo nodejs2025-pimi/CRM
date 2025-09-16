@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@shared-libs/*": ["libs/*/src"]
+        },
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true
+    },
+    "include": ["apps/*/src/**/*", "libs/*/src/**/*"]
+}
