@@ -19,7 +19,7 @@
         "lint:back": "npm --workspace=apps/backend run lint",
         "format:back": "npm --workspace=apps/backend run format"
     },
-    "dependencies": {
+    "devDependencies": {
         "husky": "^9.1.7"
     }
 }
