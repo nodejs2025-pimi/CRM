@@ -1,5 +1,4 @@
 npm run lint:back
 npm run format:back
-git add .
 
 npm run test:back:unit
