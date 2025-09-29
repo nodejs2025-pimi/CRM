@@ -15,11 +15,16 @@
         "start:front": "npm --workspace=apps/frontend run start",
         "start:back": "npm --workspace=apps/backend run start",
         "start:back:dev": "npm --workspace=apps/backend run start:dev",
+        "start:front:dev": "npm --workspace=apps/frontend run start:dev",
         "test:back": "npm run test:back:unit & npm run test:back:e2e",
         "test:back:unit": "npm --workspace=apps/backend run test",
         "test:back:e2e": "npm --workspace=apps/backend run test:e2e",
+        "lint": "npm run lint:back & npm run lint:front",
         "lint:back": "npm --workspace=apps/backend run lint",
-        "format:back": "prettier --config ./.prettierrc --write \"apps/backend/{src,test}/**/*.ts\""
+        "lint:front": "npm --workspace=apps/frontend run lint",
+        "format": "npm run format:back & npm run format:front",
+        "format:back": "prettier --config ./.prettierrc --write \"apps/backend/{src,test}/**/*.ts\"",
+        "format:front": "prettier --config ./.prettierrc --write \"apps/frontend/src/**/*.{ts,html,css}\""
     },
     "dependencies": {
         "rxjs": "^7.8.1"
