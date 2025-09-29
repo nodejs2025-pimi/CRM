@@ -1,0 +1,7 @@
+MSG_FILE=$1
+MSG=$(cat "$MSG_FILE")
+
+if ! echo "$MSG" | grep -qE "^(feat|fix|chore|docs|refactor)(\([a-z]+\))?: .+"; then
+  echo "commit message should be in the format: type(scope): completed task"
+  exit 1
+fi

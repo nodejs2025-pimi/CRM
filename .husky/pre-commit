@@ -1,4 +1,18 @@
-npm run lint:back
-npm run format:back
+echo "Linting..."
+npm run lint || exit 1
+echo "Formatting..."
+npm run format || exit 1
 
-npm run test:back:unit
+echo "Running backend unit tests..."
+npm run test:back:unit || exit 1
+
+echo "Fetching remote..."
+git fetch || exit 1
+
+LOCAL=$(git rev-parse @)
+REMOTE=$(git rev-parse @{u})
+
+if [ "$LOCAL" != "$REMOTE" ]; then
+    echo "There are new commits on the remote! Do a 'git pull' before the commit."
+    exit 1
+fi

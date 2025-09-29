@@ -1,1 +1,2 @@
-npm run test:back
+echo "Testing..."
+npm run test:back || exit 1
