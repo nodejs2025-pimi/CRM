@@ -24,7 +24,7 @@
         "lint:front": "npm --workspace=apps/frontend run lint",
         "format": "npm run format:back & npm run format:front",
         "format:back": "prettier --config ./.prettierrc --write \"apps/backend/{src,test}/**/*.ts\"",
-        "format:front": "prettier --config ./.prettierrc --write \"apps/frontend/src/**/*.{ts,html,css}\""
+        "format:front": "prettier --config apps/frontend/.prettierrc --write \"apps/frontend/src/**/*.{ts,html,css}\""
     },
     "dependencies": {
         "rxjs": "^7.8.1"
