@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./apps/backend/Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/backend:/CRM/apps/backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile.dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - ./apps/frontend:/CRM/apps/frontend
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

@@ -1,0 +1,13 @@
+FROM node:24-alpine
+
+WORKDIR /CRM
+
+COPY ./package*.json ./
+
+COPY ./apps/backend/package*.json ./apps/backend/
+
+RUN npm install --only=dev
+
+COPY ./apps/backend ./apps/backend
+
+CMD ["npm", "run", "start:back:dev"]
