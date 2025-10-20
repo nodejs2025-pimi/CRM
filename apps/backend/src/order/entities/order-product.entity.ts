@@ -8,7 +8,7 @@ import {
 } from 'typeorm';
 import { Order } from './order.entity';
 import { Product } from '../../product/entities/product.entity';
-import { NumericTransformer } from '../../database/transformers/numeric.transformer';
+import { NumericTransformer } from '../../common/transformers/numeric.transformer';
 
 @Entity('order_product')
 @Check('"quantity" > 0')
