@@ -29,6 +29,7 @@ import { Establishment } from './establishment/entities/establishment.entity';
       inject: [ConfigService],
       useFactory: (cfg: ConfigService) => ({
         type: 'postgres',
+        host: cfg.get('DB_HOST') || 'localhost',
         database: cfg.getOrThrow<string>('DB_NAME'),
         port: +cfg.getOrThrow<number>('DB_PORT'),
         username: cfg.getOrThrow<string>('DB_USER'),
