@@ -1,4 +1,13 @@
-import { IsBoolean, IsInt, IsNumber, IsOptional, IsString, Length, MaxLength, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateProductDto {
@@ -7,7 +16,6 @@ export class CreateProductDto {
     maximum: 100,
     example: 'Apple',
   })
-
   @IsString()
   @Length(1, 100)
   name: string;
@@ -17,7 +25,6 @@ export class CreateProductDto {
     default: 0,
     example: 5,
   })
-
   @IsOptional()
   @IsInt()
   @Min(0)
@@ -28,7 +35,6 @@ export class CreateProductDto {
     minimum: 0,
     example: 200.99,
   })
-
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price: number;
@@ -38,7 +44,6 @@ export class CreateProductDto {
     minimum: 0,
     example: 200.99,
   })
-
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   wholesale_price: number;
@@ -47,7 +52,6 @@ export class CreateProductDto {
     minimum: 0,
     example: 100,
   })
-
   @IsInt()
   @Min(0)
   wholesale_minimum_quantity: number;
@@ -56,7 +60,6 @@ export class CreateProductDto {
     example: false,
     default: true,
   })
-
   @IsOptional()
   @IsBoolean()
   is_active?: boolean;
