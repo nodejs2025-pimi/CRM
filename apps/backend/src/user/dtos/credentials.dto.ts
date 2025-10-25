@@ -14,7 +14,7 @@ export class CredentialsDto {
 
   @ApiProperty({
     minimum: 8,
-    example: 'v3rY_Str0ng_p4$$w0rD',
+    example: 'v3rY_Str0ng_p4SSw0rD',
   })
   @IsString()
   @MinLength(8)
