@@ -12,5 +12,11 @@
 
 .layout__main {
     flex-grow: 1;
+    padding: 24px;
     background-color: var(--surface-primary-color);
+}
+
+.main__content {
+    max-width: 1000px;
+    margin: 0 auto;
 }
