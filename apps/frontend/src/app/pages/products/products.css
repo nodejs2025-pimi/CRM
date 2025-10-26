@@ -1,0 +1,67 @@
+.products {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.products__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.products__table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+}
+
+.table__row {
+    transition: background-color 0.3s ease;
+    will-change: background-color;
+}
+
+.table__row:hover {
+    background-color: var(--surface-primary-hover-color);
+}
+
+.table__cell {
+    height: 80px;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--primary-text-color);
+    text-align: left;
+    border-bottom: 1px solid var(--secondary-color);
+}
+
+.table__cell_header {
+    font-weight: 600;
+}
+
+.table__cell_clickable {
+    cursor: pointer;
+}
+
+.table__cell_centered {
+    text-align: center;
+}
+
+.cell__status {
+    font-weight: 600;
+}
+
+.cell__status_active {
+    color: var(--success-color);
+}
+
+.cell__status_inactive {
+    color: var(--error-color);
+}
+
+.action-wrapper {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: center;
+}
