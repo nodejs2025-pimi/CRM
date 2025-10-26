@@ -1,1 +1,55 @@
-<p>shops works!</p>
+<div class="shops">
+    <div class="shops__header">
+        <ui-title [title]="'Establishments'"></ui-title>
+
+        <ui-button [label]="'Add establishment'" [icon]="'fa-solid fa-plus'" [type]="'primary'"></ui-button>
+    </div>
+
+    <div class="shops__list">
+        @for (shop of shops(); track shop.establishment_id) {
+        <div class="shops__item">
+            <div class="item__info">
+                <div class="item__title">
+                    @if (shop.type === ShopTypeEnum.CAFE) {
+                    <span class="item__type">
+                        <i class="fa-solid fa-mug-saucer"></i>
+                    </span>
+                    } @else if (shop.type === ShopTypeEnum.RESTAURANT) {
+                    <span class="item__type">
+                        <i class="fa-solid fa-utensils"></i>
+                    </span>
+                    } @else if (shop.type === ShopTypeEnum.SHOP) {
+                    <span class="item__type">
+                        <i class="fa-solid fa-store"></i>
+                    </span>
+                    }
+
+                    <span class="item__name">{{ shop.name }}</span>
+                </div>
+
+                <div class="item__details">
+                    <span class="details__row">
+                        <i class="fa-solid fa-location-dot"></i>
+                        {{ shop.address }}
+                    </span>
+
+                    <span class="details__row">
+                        <i class="fa-solid fa-phone"></i>
+                        {{ shop.phone }}
+                    </span>
+
+                    <span class="details__row">
+                        <i class="fa-solid fa-envelope"></i>
+                        {{ shop.email }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="item__actions">
+                <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'"></ui-button>
+                <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'"></ui-button>
+            </div>
+        </div>
+        }
+    </div>
+</div>

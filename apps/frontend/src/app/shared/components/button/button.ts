@@ -2,7 +2,7 @@ import { CommonModule } from "@angular/common";
 import { Component, input, InputSignal } from "@angular/core";
 
 @Component({
-    selector: "app-button",
+    selector: "ui-button",
     imports: [CommonModule],
     templateUrl: "./button.html",
     styleUrl: "./button.css",
