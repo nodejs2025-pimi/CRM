@@ -2,7 +2,7 @@
     <div class="shops__header">
         <ui-title [title]="'Establishments'"></ui-title>
 
-        <ui-button [label]="'Add establishment'" [icon]="'fa-solid fa-plus'" [type]="'primary'"></ui-button>
+        <ui-button [label]="'Add establishment'" [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="openShopCreationPopup()"></ui-button>
     </div>
 
     <div class="shops__list">
@@ -46,10 +46,32 @@
             </div>
 
             <div class="item__actions">
-                <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'"></ui-button>
-                <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'"></ui-button>
+                <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'" (click)="editShop(shop.establishment_id)"></ui-button>
+                <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'" (click)="deleteShop(shop.establishment_id)"></ui-button>
             </div>
         </div>
         }
     </div>
 </div>
+
+<ui-popup [isOpen]="isShopCreationPopupOpen() || isShopEditingPopupOpen()" [title]="popupTitle()" (closePopup)="onPopupClose()">
+    <form class="popup__form">
+        <ui-input [label]="'Name'" [(value)]="shopName" [type]="'text'" [name]="'shop-name'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input [label]="'Phone'" [(value)]="shopPhone" [type]="'phone'" [name]="'shop-phone'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input [label]="'Email'" [(value)]="shopEmail" [type]="'email'" [name]="'shop-email'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input [label]="'Type'" [(value)]="shopType" [type]="'text'" [name]="'shop-type'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input [label]="'Address'" [(value)]="shopAddress" [type]="'text'" [name]="'shop-address'" [autocomplete]="'off'"></ui-input>
+
+        <ui-button
+            class="form__submit"
+            [label]="'Submit'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="createShop($event)"
+        ></ui-button>
+    </form>
+</ui-popup>

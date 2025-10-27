@@ -74,3 +74,13 @@
     flex-direction: column;
     gap: 12px;
 }
+
+.popup__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form__submit {
+    margin-top: 16px;
+}
