@@ -16,6 +16,13 @@ async function bootstrap() {
 
   app.useGlobalFilters(new PostgresExceptionFilter());
 
+  app.enableCors({
+    origin: ['http://127.0.0.1:4200', 'http://localhost:4200'],
+    methods: 'GET,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
+
   const config = new DocumentBuilder()
     .setTitle('CRM')
     .setVersion('1.0.0')
