@@ -1,0 +1,15 @@
+<div class="popup" [ngClass]="{'popup_opened': isOpen()}">
+    <div class="popup__overlay"></div>
+
+    <div #popupContent class="popup__content">
+        <div class="popup__header">
+            <ui-title [title]="title()"></ui-title>
+
+            <ui-button class="popup__close" [icon]="'fa-solid fa-xmark'" [type]="'primary-line'" (click)="onCloseButtonClick()"></ui-button>
+        </div>
+
+        <div class="popup__body">
+            <ng-content></ng-content>
+        </div>
+    </div>
+</div>
