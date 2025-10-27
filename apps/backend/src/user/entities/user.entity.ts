@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, Check } from 'typeorm';
 
 @Entity('users')
+@Check(`btrim(username) <> ''`)
 export class User {
   @PrimaryGeneratedColumn()
   user_id: number;
@@ -15,7 +16,7 @@ export class User {
 
   @Column({
     type: 'varchar',
-    length: 256,
+    length: 60,
     nullable: false,
   })
   password_hash: string;

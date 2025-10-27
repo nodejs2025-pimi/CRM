@@ -5,7 +5,7 @@ import {
   Check,
   OneToMany,
 } from 'typeorm';
-import { NumericTransformer } from '../../database/transformers/numeric.transformer';
+import { NumericTransformer } from '../../common/transformers/numeric.transformer';
 import { OrderProduct } from '../../order/entities/order-product.entity';
 
 @Entity('products')
