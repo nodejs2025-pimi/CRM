@@ -10,7 +10,7 @@ import { Title } from "@shared/components/title/title";
     styleUrl: "./popup.css",
 })
 export class Popup {
-    public isOpen: ModelSignal<boolean> = model.required<boolean>();
+    public isOpen: ModelSignal<boolean> = model<boolean>(false);
     public title: InputSignal<string> = input<string>("");
 
     public closePopup: OutputEmitterRef<void> = output();

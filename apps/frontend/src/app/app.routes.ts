@@ -30,4 +30,24 @@ export const routes: Routes = [
             },
         ],
     },
+    {
+        path: "auth",
+        loadComponent: () => import("@layouts/auth/auth").then((m) => m.Auth),
+        children: [
+            {
+                path: "login",
+                loadComponent: () => import("@pages/login/login").then((m) => m.Login),
+            },
+            {
+                path: "",
+                redirectTo: "login",
+                pathMatch: "full",
+            }
+        ]
+    },
+    {
+        path: "**",
+        redirectTo: "",
+        pathMatch: "full"
+    }
 ];
