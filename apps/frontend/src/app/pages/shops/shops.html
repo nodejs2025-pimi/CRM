@@ -66,12 +66,22 @@
 
         <ui-input [label]="'Address'" [(value)]="shopAddress" [type]="'text'" [name]="'shop-address'" [autocomplete]="'off'"></ui-input>
 
+        @if (isShopEditingPopupOpen()) {
         <ui-button
             class="form__submit"
-            [label]="'Submit'"
+            [label]="'Update'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="updateShop($event)"
+        ></ui-button>
+        } @else {
+        <ui-button
+            class="form__submit"
+            [label]="'Create'"
             [type]="'primary'"
             [isFullWidth]="true"
             (click)="createShop($event)"
         ></ui-button>
+        }
     </form>
 </ui-popup>

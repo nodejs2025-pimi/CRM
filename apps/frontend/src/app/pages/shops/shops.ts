@@ -22,6 +22,8 @@ export class Shops implements OnInit {
 
     protected popupTitle: WritableSignal<string> = signal("");
 
+    protected editingShopId: WritableSignal<number | null> = signal(null);
+
     protected shopName: WritableSignal<string> = signal("");
     protected shopPhone: WritableSignal<string> = signal("");
     protected shopEmail: WritableSignal<string> = signal("");
@@ -92,8 +94,7 @@ export class Shops implements OnInit {
     protected createShop(event: Event): void {
         event.preventDefault();
 
-        const newShop: ShopType = {
-            establishment_id: 0,
+        const newShop: Omit<ShopType, "establishment_id"> = {
             name: this.shopName(),
             phone: "+38" + this.shopPhone(),
             email: this.shopEmail(),
@@ -115,6 +116,8 @@ export class Shops implements OnInit {
             return;
         }
 
+        this.editingShopId.set(id);
+
         this.shopName.set(shopToEdit.name);
         this.shopPhone.set(shopToEdit.phone.replace("+38", ""));
         this.shopEmail.set(shopToEdit.email);
@@ -125,7 +128,9 @@ export class Shops implements OnInit {
         this.isShopEditingPopupOpen.set(true);
     }
 
-    protected updateShop(id: number): void {
+    protected updateShop(event: Event): void {
+        event.preventDefault();
+
         const updatedShopData: Omit<ShopType, "establishment_id"> = {
             name: this.shopName(),
             phone: "+38" + this.shopPhone(),
@@ -134,14 +139,16 @@ export class Shops implements OnInit {
             address: this.shopAddress(),
         };
 
-        this.shopsService.updateShop(id, updatedShopData)
+        this.shopsService.updateShop(this.editingShopId()!, updatedShopData)
             .then((updatedShop: ShopType) => {
                 this.shops.update((shops: ShopType[]) => shops.map((shop: ShopType) => {
-                    if (shop.establishment_id === id) {
+                    if (shop.establishment_id === this.editingShopId()!) {
                         return updatedShop;
                     }
                     return shop;
                 }));
+
+                this.isShopEditingPopupOpen.set(false);
             });
     }
 
