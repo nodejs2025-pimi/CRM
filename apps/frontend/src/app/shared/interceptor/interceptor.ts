@@ -21,7 +21,15 @@ export const interceptor: HttpInterceptorFn = (req, next) => {
                     if (refreshToken) {
                         return authService.refreshToken(refreshToken)
                             .pipe(
-                                switchMap(() => next(newRequest)),
+                                switchMap(() => {
+                                    const updatedRequest: HttpRequest<unknown> = newRequest.clone({
+                                        setHeaders: {
+                                            Authorization: `Bearer ${localStorage.getItem("token") || ""}`,
+                                        },
+                                    });
+
+                                    return next(updatedRequest)
+                                }),
                                 catchError((refreshError) => {
                                     localStorage.removeItem("token");
                                     return throwError(() => refreshError);

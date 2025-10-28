@@ -18,7 +18,7 @@ export class AuthService {
     }
 
     refreshToken(refreshToken: string): Observable<string> {
-        return this.httpClient.post<{ accessToken: string }>(environment.serverUrl + "/auth/refresh", { refreshToken })
+        return this.httpClient.post<{ accessToken: string }>(environment.serverUrl + "/auth/refresh", { token: refreshToken })
             .pipe(
                 map((response: { accessToken: string }) => {
                     localStorage.setItem("token", response.accessToken);
