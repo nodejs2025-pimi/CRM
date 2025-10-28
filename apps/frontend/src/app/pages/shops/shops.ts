@@ -32,48 +32,11 @@ export class Shops implements OnInit {
 
     private shopsService: ShopsService = inject(ShopsService);
 
-    ngOnInit() {
+    ngOnInit(): void {
         this.loadShops();
     }
 
-    private loadShops() {
-        // const fetchedShops: ShopType[] = [
-        //     {
-        //         establishment_id: 1,
-        //         name: "Shop 1",
-        //         phone: "0991234567",
-        //         email: "shop1@example.com",
-        //         type: ShopTypeEnum.SHOP,
-        //         address: "Location 1",
-        //     },
-        //     {
-        //         establishment_id: 2,
-        //         name: "Shop 2",
-        //         phone: "0991234567",
-        //         email: "shop2@example.com",
-        //         type: ShopTypeEnum.SHOP,
-        //         address: "Location 2",
-        //     },
-        //     {
-        //         establishment_id: 3,
-        //         name: "Cafe 1",
-        //         phone: "0991234567",
-        //         email: "cafe1@example.com",
-        //         type: ShopTypeEnum.CAFE,
-        //         address: "Location 3",
-        //     },
-        //     {
-        //         establishment_id: 4,
-        //         name: "Restaurant 1",
-        //         phone: "0991234567",
-        //         email: "restaurant1@example.com",
-        //         type: ShopTypeEnum.RESTAURANT,
-        //         address: "Location 4",
-        //     },
-        // ];
-
-        // this.shops.set(fetchedShops);
-
+    private loadShops(): void {
         this.shopsService.getShops()
             .then((fetchedShops: ShopType[]) => {
                 this.shops.set(fetchedShops);
@@ -103,8 +66,8 @@ export class Shops implements OnInit {
         };
 
         this.shopsService.createShop(newShop)
-            .then((createdShop: ShopType) => {
-                this.shops.update((shops: ShopType[]) => [...shops, createdShop]);
+            .then(() => {
+                this.loadShops();
                 this.isShopCreationPopupOpen.set(false);
             });
     }
@@ -140,14 +103,8 @@ export class Shops implements OnInit {
         };
 
         this.shopsService.updateShop(this.editingShopId()!, updatedShopData)
-            .then((updatedShop: ShopType) => {
-                this.shops.update((shops: ShopType[]) => shops.map((shop: ShopType) => {
-                    if (shop.establishment_id === this.editingShopId()!) {
-                        return updatedShop;
-                    }
-                    return shop;
-                }));
-
+            .then(() => {
+                this.loadShops();
                 this.isShopEditingPopupOpen.set(false);
             });
     }
@@ -160,7 +117,7 @@ export class Shops implements OnInit {
     protected deleteShop(id: number): void {
         this.shopsService.deleteShop(id)
             .then(() => {
-                this.shops.update((shops: ShopType[]) => shops.filter((shop: ShopType) => shop.establishment_id !== id));
+                this.loadShops();
             });
     }
 }

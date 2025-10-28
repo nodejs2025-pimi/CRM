@@ -65,3 +65,13 @@
     align-items: center;
     justify-content: center;
 }
+
+.popup__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form__submit {
+    margin-top: 16px;
+}
