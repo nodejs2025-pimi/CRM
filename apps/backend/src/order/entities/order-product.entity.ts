@@ -6,6 +6,7 @@ import {
   JoinColumn,
   Check,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { Order } from './order.entity';
 import { Product } from '../../product/entities/product.entity';
 import { NumericTransformer } from '../../common/transformers/numeric.transformer';
@@ -21,7 +22,9 @@ export class OrderProduct {
 
   @PrimaryColumn({
     type: 'integer',
+    select: false,
   })
+  @Exclude({ toPlainOnly: true })
   product_id: number;
 
   @Column({

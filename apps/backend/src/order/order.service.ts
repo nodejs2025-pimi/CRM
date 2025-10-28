@@ -23,7 +23,7 @@ export class OrderService {
   async getOrderById(id: number) {
     const order = await this.order.findOne({
       where: { order_id: id },
-      relations: { orderProducts: true, establishment: true },
+      relations: { orderProducts: { product: true }, establishment: true },
     });
 
     if (!order) {
@@ -56,7 +56,7 @@ export class OrderService {
 
   async getAllOrders() {
     return this.order.find({
-      relations: { orderProducts: true, establishment: true },
+      relations: { orderProducts: { product: true }, establishment: true },
     });
   }
 
@@ -97,7 +97,9 @@ export class OrderService {
   }
 
   async createOrder(dto: CreateOrderDto) {
-    await this.establishmentService.getById(dto.establishment_id);
+    const establishmentId = dto.establishment_id;
+
+    await this.establishmentService.getById(establishmentId);
 
     const order = this.order.create(dto);
 
@@ -105,8 +107,9 @@ export class OrderService {
   }
 
   async addOrderProduct(id: number, dto: AddOrderProductDto) {
+    const productId = dto.product_id;
     const order = await this.getOrderById(id);
-    const product = await this.productService.getById(dto.product_id);
+    const product = await this.productService.getById(productId);
 
     let price: number;
 
