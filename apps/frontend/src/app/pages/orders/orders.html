@@ -1,1 +1,142 @@
-<p>orders works!</p>
+<div class="orders">
+    <div class="orders__header">
+        <ui-title [title]="'Orders'"></ui-title>
+
+        <ui-button [label]="'Add order'" [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="openOrderCreationPopup()"></ui-button>
+    </div>
+
+    <div class="orders__list">
+        <div class="list__header">
+            <span class="header__column header__number">#</span>
+            <span class="header__column header__establishment">Establishment</span>
+            <span class="header__column header__column_centered header__date">Date</span>
+            <span class="header__column header__column_centered header__status">Status</span>
+            <span class="header__column header__column_centered header__price">Total Price</span>
+        </div>
+
+        @for(order of orders(); track order.order_id) {
+        <div class="list__order">
+            <div class="order__header">
+                <div class="order__info">
+                    <span class="info__column info__number">{{ order.order_id }}</span>
+
+                    <span class="info__column info__establishment">
+                        @if (order.establishment.type === ShopTypeEnum.CAFE) {
+                        <i class="fa-solid fa-mug-saucer"></i>
+                        } @else if (order.establishment.type === ShopTypeEnum.RESTAURANT) {
+                        <i class="fa-solid fa-utensils"></i>
+                        } @else if (order.establishment.type === ShopTypeEnum.SHOP) {
+                        <i class="fa-solid fa-store"></i>
+                        } {{ order.establishment.name }}
+                    </span>
+
+                    <span class="info__column info__column_centered info__date">{{ order.date | date: "dd MMM y":"":"en-US" }}</span>
+
+                    @if (order.status === OrderStatusEnum.NEW) {
+                    <span class="info__column info__column_centered info__status info__status_new">New</span>
+                    } @else if (order.status === OrderStatusEnum.CONFIRMED) {
+                    <span class="info__column info__column_centered info__status info__status_confirmed">Confirmed</span>
+                    } @else if (order.status === OrderStatusEnum.DELIVERED) {
+                    <span class="info__column info__column_centered info__status info__status_delivered">Delivered</span>
+                    }
+
+                    <span class="info__column info__column_centered info__price">{{ getTotalOrderPrice(order) | currency: "UAH" }}</span>
+                </div>
+
+                <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'" (click)="editOrder(order.order_id)"></ui-button>
+
+                <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'" (click)="deleteOrder(order.order_id)"></ui-button>
+
+                @if (isOrderOpened(order.order_id)) {
+                <ui-button [icon]="'fa-solid fa-chevron-up'" [type]="'primary-line'" (click)="toggleOrderDetails(order.order_id)"></ui-button>
+                } @else {
+                <ui-button [icon]="'fa-solid fa-chevron-down'" [type]="'primary-line'" (click)="toggleOrderDetails(order.order_id)"></ui-button>
+                }
+            </div>
+
+            @if (isOrderOpened(order.order_id)) {
+            <div class="order__body">
+                <ui-button
+                    [label]="'Add item'"
+                    [icon]="'fa-solid fa-plus'"
+                    [type]="'primary'"
+                    [isFullWidth]="true"
+                    (click)="openOrderItemCreationPopup(order.order_id)"
+                ></ui-button>
+
+                @for(item of order.orderProducts; track item.product.product_id) {
+                <div class="order__item">
+                    <span class="item__column item__name">{{ item.product.name }}</span>
+                    <span class="item__column item__price">{{ item.quantity }} pcs. × {{ item.product.price | currency: "UAH" }}</span>
+                    <span class="item__column item__total">{{ item.price | currency: "UAH" }}</span>
+
+                    <ui-button
+                        [icon]="'fa-solid fa-pen'"
+                        [type]="'primary-line'"
+                        (click)="editOrderItem(order.order_id, item.product.product_id)"
+                    ></ui-button>
+                    <ui-button
+                        [icon]="'fa-solid fa-trash'"
+                        [type]="'primary-line'"
+                        (click)="deleteOrderItem(order.order_id, item.product.product_id)"
+                    ></ui-button>
+                </div>
+                }
+            </div>
+            }
+        </div>
+        }
+    </div>
+</div>
+
+<ui-popup [isOpen]="isOrderCreationPopupOpen() || isOrderEditingPopupOpen()" [title]="orderPopupTitle()" (closePopup)="onOrderPopupClose()">
+    <form class="popup__form">
+        <ui-input
+            [label]="'Establishment'"
+            [(value)]="orderEstablishmentId"
+            [type]="'number'"
+            [isDisabled]="isOrderEditingPopupOpen()"
+            [name]="'order-establishment'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        <ui-input [label]="'Status'" [(value)]="orderStatus" [name]="'order-status'" [autocomplete]="'off'"></ui-input>
+
+        @if (isOrderEditingPopupOpen()) {
+        <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateOrder($event)"></ui-button>
+        } @else {
+        <ui-button class="form__submit" [label]="'Create'" [type]="'primary'" [isFullWidth]="true" (click)="createOrder($event)"></ui-button>
+        }
+    </form>
+</ui-popup>
+
+<ui-popup
+    [isOpen]="isOrderItemCreationPopupOpen() || isOrderItemEditingPopupOpen()"
+    [title]="orderItemPopupTitle()"
+    (closePopup)="onOrderItemPopupClose()"
+>
+    <form class="popup__form">
+        <ui-input
+            [label]="'Product'"
+            [(value)]="orderItemProductId"
+            [type]="'number'"
+            [isDisabled]="isOrderItemEditingPopupOpen()"
+            [name]="'order-item-product'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        <ui-input
+            [label]="'Quantity'"
+            [(value)]="orderItemQuantity"
+            [type]="'number'"
+            [name]="'order-item-quantity'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        @if (isOrderItemEditingPopupOpen()) {
+        <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateOrderItem($event)"></ui-button>
+        } @else {
+        <ui-button class="form__submit" [label]="'Create'" [type]="'primary'" [isFullWidth]="true" (click)="addOrderItem($event)"></ui-button>
+        }
+    </form>
+</ui-popup>

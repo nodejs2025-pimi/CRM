@@ -1,0 +1,148 @@
+.orders {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.orders__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.orders__list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-top: 20px;
+}
+
+.list__header {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px;
+    background-color: var(--background-color);
+    border-radius: 16px;
+}
+
+.header__column {
+    font-weight: 600;
+}
+
+.list__order {
+    overflow: hidden;
+    border: 2px solid var(--background-color);
+    border-radius: 16px;
+}
+
+.order__header {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 16px 24px;
+    background-color: var(--background-color);
+}
+
+.order__info {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.info__column_centered,
+.header__column_centered {
+    text-align: center;
+}
+
+.info__number,
+.header__number {
+    width: 54px;
+}
+
+.info__number {
+    color: var(--secondary-color);
+}
+
+.info__establishment,
+.header__establishment {
+    width: 340px;
+}
+
+.info__establishment {
+    display: flex;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.info__date,
+.header__date {
+    width: 130px;
+}
+
+.info__status,
+.header__status {
+    width: 130px;
+}
+
+.info__status {
+    font-weight: 600;
+}
+
+.info__status_new {
+    color: var(--primary-color);
+}
+
+.info__status_confirmed {
+    color: var(--warning-color);
+}
+
+.info__status_delivered {
+    color: var(--success-color);
+}
+
+.info__price,
+.header__price {
+    width: 120px;
+}
+
+.order__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 24px;
+}
+
+.order__item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 24px;
+    background-color: var(--background-color);
+    border-radius: 8px;
+}
+
+.item__name {
+    font-weight: 600;
+}
+
+.item__price {
+    width: 160px;
+    margin-left: auto;
+    text-align: center;
+}
+
+.item__total {
+    width: 100px;
+    text-align: center;
+}
+
+.popup__form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form__submit {
+    margin-top: 16px;
+}
