@@ -25,7 +25,7 @@ export class CreateEstablishmentDto {
   @MaxLength(100)
   email: string;
 
-  @ApiProperty({ example: '+380123456789', maximum: 13 })
+  @ApiProperty({ example: '+380683957989', maximum: 13 })
   @IsPhoneNumber('UA')
   @MaxLength(13)
   phone: string;

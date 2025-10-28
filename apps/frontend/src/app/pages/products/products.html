@@ -2,7 +2,11 @@
     <div class="products__header">
         <ui-title [title]="'Products'"></ui-title>
 
-        <ui-button [label]="'Add product'" [icon]="'fa-solid fa-plus'" [type]="'primary'"></ui-button>
+        <ui-button [label]="'Add product'" [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="openProductCreationPopup()"></ui-button>
+    </div>
+
+    <div class="products__search">
+        <ui-input [placeholder]="'Search products...'" [(value)]="searchValue" [type]="'text'" [name]="'products-search'" [autocomplete]="'off'"></ui-input>
     </div>
 
     <table class="products__table">
@@ -15,6 +19,7 @@
                     <i class="fa-solid fa-arrows-up-down"></i>
                     }
                 </th>
+
                 <th class="table__cell table__cell_header table__cell_clickable table__cell_centered" (click)="orderBy('price')">
                     Price @if (orderByField() === 'price') {
                     <i class="fa-solid" [ngClass]="orderDirection() === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
@@ -22,7 +27,9 @@
                     <i class="fa-solid fa-arrows-up-down"></i>
                     }
                 </th>
+
                 <th class="table__cell table__cell_header table__cell_centered">Wholesale Price</th>
+
                 <th class="table__cell table__cell_header table__cell_clickable table__cell_centered" (click)="orderBy('available_quantity')">
                     Available Quantity @if (orderByField() === 'available_quantity') {
                     <i class="fa-solid" [ngClass]="orderDirection() === 'asc' ? 'fa-arrow-down' : 'fa-arrow-up'"></i>
@@ -30,6 +37,7 @@
                     <i class="fa-solid fa-arrows-up-down"></i>
                     }
                 </th>
+
                 <th class="table__cell table__cell_header table__cell_centered">Status</th>
                 <th class="table__cell table__cell_header table__cell_centered">Actions</th>
             </tr>
@@ -39,11 +47,15 @@
             @for (product of products(); track product.product_id) {
             <tr class="table__row">
                 <td class="table__cell">{{ product.name }}</td>
+
                 <td class="table__cell table__cell_centered">{{ product.price | currency: "UAH" }}</td>
+
                 <td class="table__cell table__cell_centered">
                     {{ product.wholesale_price | currency: "UAH" }} (from {{ product.wholesale_minimum_quantity }} pcs.)
                 </td>
+
                 <td class="table__cell table__cell_centered">{{ product.available_quantity }}</td>
+
                 <td class="table__cell table__cell_centered">
                     @if (product.is_active) {
                     <span class="cell__status cell__status_active">Active</span>
@@ -54,8 +66,8 @@
 
                 <td class="table__cell table__cell_centered">
                     <div class="action-wrapper">
-                        <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'"></ui-button>
-                        <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'"></ui-button>
+                        <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'" (click)="editProduct(product.product_id)"></ui-button>
+                        <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'" (click)="deleteProduct(product.product_id)"></ui-button>
                     </div>
                 </td>
             </tr>
@@ -63,3 +75,43 @@
         </tbody>
     </table>
 </div>
+
+<ui-popup [isOpen]="isProductCreationPopupOpen() || isProductEditingPopupOpen()" [title]="popupTitle()" (closePopup)="onPopupClose()">
+    <form class="popup__form">
+        <ui-input [label]="'Name'" [(value)]="productName" [type]="'text'" [name]="'product-name'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input [label]="'Price'" [(value)]="productPrice" [type]="'number'" [name]="'product-price'" [autocomplete]="'off'"></ui-input>
+
+        <ui-input
+            [label]="'Wholesale Price'"
+            [(value)]="productWholesalePrice"
+            [type]="'number'"
+            [name]="'product-wholesale-price'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        <ui-input
+            [label]="'Wholesale Minimum Quantity'"
+            [(value)]="productWholesaleMinimumQuantity"
+            [type]="'number'"
+            [name]="'product-wholesale-minimum-quantity'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        <ui-input
+            [label]="'Available Quantity'"
+            [(value)]="productAvailableQuantity"
+            [type]="'number'"
+            [name]="'product-available-quantity'"
+            [autocomplete]="'off'"
+        ></ui-input>
+
+        <!-- <ui-checkbox [label]="'Active'" [(isChecked)]="productIsActive" [name]="'product-is-active'"></ui-checkbox> -->
+
+        @if (isProductEditingPopupOpen()) {
+        <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateProduct($event)"></ui-button>
+        } @else {
+        <ui-button class="form__submit" [label]="'Create'" [type]="'primary'" [isFullWidth]="true" (click)="createProduct($event)"></ui-button>
+        }
+    </form>
+</ui-popup>

@@ -11,6 +11,7 @@
     --secondary-color: #7b7bba;
 
     --disabled-color: #4d4d4d;
+    --disabled-text-color: #a1a1a1;
 
     --background-color: #1e1e2f;
     --surface-primary-color: #2a2a3d;
@@ -19,7 +20,9 @@
     --primary-text-color: #f1f1f1;
 
     --success-color: #00f5d4;
+
     --error-color: #ff6b6b;
+    --error-hover-color: #ff4c4c;
 }
 
 * {

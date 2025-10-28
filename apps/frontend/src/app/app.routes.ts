@@ -1,9 +1,11 @@
 import { Routes } from "@angular/router";
+import { authGuard } from "@shared/guards/auth.guard";
 
 export const routes: Routes = [
     {
         path: "",
         loadComponent: () => import("@layouts/layout/layout").then((m) => m.Layout),
+        canActivate: [authGuard],
         children: [
             {
                 path: "analytics",
@@ -28,4 +30,24 @@ export const routes: Routes = [
             },
         ],
     },
+    {
+        path: "auth",
+        loadComponent: () => import("@layouts/auth/auth").then((m) => m.Auth),
+        children: [
+            {
+                path: "login",
+                loadComponent: () => import("@pages/login/login").then((m) => m.Login),
+            },
+            {
+                path: "",
+                redirectTo: "login",
+                pathMatch: "full",
+            }
+        ]
+    },
+    {
+        path: "**",
+        redirectTo: "",
+        pathMatch: "full"
+    }
 ];
