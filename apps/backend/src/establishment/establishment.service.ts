@@ -38,10 +38,6 @@ export class EstablishmentService {
   async update(id: number, attrs: UpdateEstablishmentDto) {
     const establishment = await this.getById(id);
 
-    if (!establishment) {
-      throw new NotFoundException('Establishment not found.');
-    }
-
     Object.assign(establishment, attrs);
 
     return await this.establishment.save(establishment);
@@ -49,10 +45,6 @@ export class EstablishmentService {
 
   async delete(id: number) {
     const establishment = await this.getById(id);
-
-    if (!establishment) {
-      throw new NotFoundException('Establishment not found.');
-    }
 
     await this.establishment.remove(establishment);
   }

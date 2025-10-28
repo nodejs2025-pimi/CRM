@@ -5,8 +5,8 @@ import {
   OneToMany,
   ManyToOne,
   JoinColumn,
-  PrimaryColumn,
 } from 'typeorm';
+import { Exclude } from 'class-transformer';
 import { OrderStatus } from '../enums/order-status.enum';
 import { OrderProduct } from './order-product.entity';
 import { Establishment } from '../../establishment/entities/establishment.entity';
@@ -16,7 +16,11 @@ export class Order {
   @PrimaryGeneratedColumn()
   order_id: number;
 
-  @PrimaryColumn()
+  @Column({
+    type: 'integer',
+    nullable: false,
+  })
+  @Exclude({ toPlainOnly: true })
   establishment_id: number;
 
   @Column({

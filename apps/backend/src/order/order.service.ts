@@ -7,6 +7,8 @@ import { CreateOrderDto } from './dtos/create-order.dto';
 import { EstablishmentService } from '../establishment/establishment.service';
 import { AddOrderProductDto } from './dtos/add-order-product.dto';
 import { ProductService } from '../product/product.service';
+import { UpdateOrderProductDto } from './dtos/update-order-product.dto';
+import { UpdateOrderDto } from './dtos/update-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -21,7 +23,7 @@ export class OrderService {
   async getOrderById(id: number) {
     const order = await this.order.findOne({
       where: { order_id: id },
-      relations: { orderProducts: true },
+      relations: { orderProducts: true, establishment: true },
     });
 
     if (!order) {
@@ -31,18 +33,11 @@ export class OrderService {
     return order;
   }
 
-  async getAllOrders() {
-    return this.order.find({ relations: { orderProducts: true } });
-  }
-
-  async deleteOrderProductByOrderAndProductId(
-    orderId: number,
-    productId: number,
-  ) {
+  async getOrderProduct(orderId: number, productId: number) {
     const orderProduct = await this.orderProduct.findOne({
       where: {
-        order: { order_id: orderId },
-        product: { product_id: productId },
+        order_id: orderId,
+        product_id: productId,
       },
     });
 
@@ -50,34 +45,68 @@ export class OrderService {
       throw new NotFoundException('Order product not found.');
     }
 
+    return orderProduct;
+  }
+
+  async getOrderProducts(orderId: number) {
+    const order = await this.getOrderById(orderId);
+
+    return order.orderProducts;
+  }
+
+  async getAllOrders() {
+    return this.order.find({
+      relations: { orderProducts: true, establishment: true },
+    });
+  }
+
+  async removeOrderProduct(orderId: number, productId: number) {
+    const orderProduct = await this.getOrderProduct(orderId, productId);
+
     await this.orderProduct.remove(orderProduct);
   }
 
-  async createOrder(dto: CreateOrderDto) {
-    const establishmentId = dto.establishment_id;
-    const establishment =
-      await this.establishmentService.getById(establishmentId);
+  async deleteOrder(id: number) {
+    const order = await this.getOrderById(id);
 
-    if (!establishment) {
-      throw new Error('Establishment not found');
+    await this.order.remove(order);
+  }
+
+  async updateOrderProduct(
+    orderId: number,
+    productId: number,
+    dto: UpdateOrderProductDto,
+  ) {
+    const orderProduct = await this.getOrderProduct(orderId, productId);
+
+    Object.assign(orderProduct, dto);
+
+    return this.orderProduct.save(orderProduct);
+  }
+
+  async updateOrder(id: number, dto: UpdateOrderDto) {
+    const establishmentId = dto.establishment_id;
+
+    if (establishmentId) {
+      await this.establishmentService.getById(establishmentId);
     }
+
+    await this.order.update(id, dto);
+
+    return this.getOrderById(id);
+  }
+
+  async createOrder(dto: CreateOrderDto) {
+    await this.establishmentService.getById(dto.establishment_id);
 
     const order = this.order.create(dto);
 
     return this.order.save(order);
   }
 
-  async addOrderProduct(dto: AddOrderProductDto) {
-    const order = await this.getOrderById(dto.order_id);
+  async addOrderProduct(id: number, dto: AddOrderProductDto) {
+    const order = await this.getOrderById(id);
     const product = await this.productService.getById(dto.product_id);
-
-    if (!order) {
-      throw new Error('Order not found');
-    }
-
-    if (!product) {
-      throw new Error('Product not found');
-    }
 
     let price: number;
 
@@ -91,19 +120,11 @@ export class OrderService {
 
     const orderProduct = this.orderProduct.create({
       ...dto,
+      order_id: order.order_id,
+      product_id: product.product_id,
       price,
     });
 
     return this.orderProduct.save(orderProduct);
-  }
-
-  async removeOrderProduct(orderId: number, productId: number) {
-    const order = await this.getOrderById(orderId);
-
-    if (!order) {
-      throw new NotFoundException('Order not found.');
-    }
-
-    await this.deleteOrderProductByOrderAndProductId(orderId, productId);
   }
 }

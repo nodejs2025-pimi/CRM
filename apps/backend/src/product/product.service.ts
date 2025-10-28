@@ -75,6 +75,7 @@ export class ProductService {
 
   async getById(id: number) {
     const product = await this.product.findOne({ where: { product_id: id } });
+
     if (!product) throw new NotFoundException('Product not found.');
 
     return product;
