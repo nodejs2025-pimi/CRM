@@ -1,6 +1,7 @@
 import { CurrencyPipe, NgClass } from "@angular/common";
 import { Component, effect, inject, OnInit, signal, WritableSignal } from "@angular/core";
 import { Button } from "@shared/components/button/button";
+import { Checkbox } from "@shared/components/checkbox/checkbox";
 import { Input } from "@shared/components/input/input";
 import { Popup } from "@shared/components/popup/popup";
 import { Title } from "@shared/components/title/title";
@@ -9,7 +10,7 @@ import { ProductType } from "@shared/types/ProductType";
 
 @Component({
     selector: "app-products",
-    imports: [Title, Button, CurrencyPipe, NgClass, Input, Popup],
+    imports: [Title, Button, CurrencyPipe, NgClass, Input, Popup, Checkbox],
     templateUrl: "./products.html",
     styleUrl: "./products.css",
 })

@@ -106,7 +106,7 @@
             [autocomplete]="'off'"
         ></ui-input>
 
-        <!-- <ui-checkbox [label]="'Active'" [(isChecked)]="productIsActive" [name]="'product-is-active'"></ui-checkbox> -->
+        <ui-checkbox [label]="'Active'" [(value)]="productIsActive"></ui-checkbox>
 
         @if (isProductEditingPopupOpen()) {
         <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateProduct($event)"></ui-button>
