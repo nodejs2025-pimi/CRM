@@ -5,10 +5,11 @@ import { ShopsService } from "@shared/services/shops.service";
 import { ShopType, ShopTypeEnum } from "@shared/types/ShopType";
 import { Popup } from "@shared/components/popup/popup";
 import { Input } from "@shared/components/input/input";
+import { Select } from "@shared/components/select/select";
 
 @Component({
     selector: "app-shops",
-    imports: [Title, Button, Popup, Input],
+    imports: [Title, Button, Popup, Input, Select],
     templateUrl: "./shops.html",
     styleUrl: "./shops.css",
 })

@@ -91,16 +91,17 @@
 
 <ui-popup [isOpen]="isOrderCreationPopupOpen() || isOrderEditingPopupOpen()" [title]="orderPopupTitle()" (closePopup)="onOrderPopupClose()">
     <form class="popup__form">
-        <ui-input
-            [label]="'Establishment'"
-            [(value)]="orderEstablishmentId"
-            [type]="'number'"
-            [isDisabled]="isOrderEditingPopupOpen()"
-            [name]="'order-establishment'"
-            [autocomplete]="'off'"
-        ></ui-input>
+        <ui-select [label]="'Establishment'" [(value)]="orderEstablishmentId" [isDisabled]="isOrderEditingPopupOpen()">
+            @for(shop of shops(); track shop.establishment_id) {
+            <option [value]="shop.establishment_id">{{ shop.name }} ({{ shop.type }})</option>
+            }
+        </ui-select>
 
-        <ui-input [label]="'Status'" [(value)]="orderStatus" [name]="'order-status'" [autocomplete]="'off'"></ui-input>
+        <ui-select [label]="'Status'" [(value)]="orderStatus">
+            <option [value]="OrderStatusEnum.NEW">New</option>
+            <option [value]="OrderStatusEnum.CONFIRMED">Confirmed</option>
+            <option [value]="OrderStatusEnum.DELIVERED">Delivered</option>
+        </ui-select>
 
         @if (isOrderEditingPopupOpen()) {
         <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateOrder($event)"></ui-button>
@@ -116,19 +117,17 @@
     (closePopup)="onOrderItemPopupClose()"
 >
     <form class="popup__form">
-        <ui-input
-            [label]="'Product'"
-            [(value)]="orderItemProductId"
-            [type]="'number'"
-            [isDisabled]="isOrderItemEditingPopupOpen()"
-            [name]="'order-item-product'"
-            [autocomplete]="'off'"
-        ></ui-input>
+        <ui-select [label]="'Product'" [(value)]="orderItemProductId" [isDisabled]="isOrderItemEditingPopupOpen()">
+            @for(product of products(); track product.product_id) {
+            <option [value]="product.product_id">{{ product.name }} - {{ product.price | currency: "UAH" }}</option>
+            }
+        </ui-select>
 
         <ui-input
             [label]="'Quantity'"
             [(value)]="orderItemQuantity"
             [type]="'number'"
+            [minNumber]="1"
             [name]="'order-item-quantity'"
             [autocomplete]="'off'"
         ></ui-input>

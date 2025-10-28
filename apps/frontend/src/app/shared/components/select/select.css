@@ -1,0 +1,79 @@
+.label {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    user-select: none;
+}
+
+.label__text {
+    padding-left: 16px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--primary-text-color);
+}
+
+.select {
+    min-width: 140px;
+    height: 40px;
+    padding: 8px 40px 8px 16px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--primary-text-color);
+    appearance: none;
+    cursor: pointer;
+    outline: none;
+    background-color: var(--background-color);
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    transition: border-color 0.3s;
+}
+
+.select:hover:not(.select_disabled) {
+    border-color: var(--primary-hover-color);
+}
+
+:host:has(.select_width_full) {
+    display: inline-block;
+    width: 100%;
+}
+
+.label_width_full {
+    width: 100%;
+}
+
+.select_width_full {
+    width: 100%;
+}
+
+.select-arrow {
+    position: absolute;
+    pointer-events: none;
+    transition: color 0.3s;
+}
+
+.select + .select-arrow {
+    top: 12px;
+    right: 16px;
+    font-size: 16px;
+    color: var(--primary-color);
+}
+
+.label_with_text .select + .select-arrow {
+    top: 36px;
+}
+
+.select:hover:not(.select_disabled) + .select-arrow {
+    color: var(--primary-hover-color);
+}
+
+.select_disabled {
+    color: var(--disabled-text-color);
+    background-color: var(--surface-primary-color);
+    border-color: var(--disabled-color);
+}
+
+.select_disabled + .select-arrow {
+    color: var(--disabled-color);
+}

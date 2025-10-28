@@ -62,7 +62,11 @@
 
         <ui-input [label]="'Email'" [(value)]="shopEmail" [type]="'email'" [name]="'shop-email'" [autocomplete]="'off'"></ui-input>
 
-        <ui-input [label]="'Type'" [(value)]="shopType" [type]="'text'" [name]="'shop-type'" [autocomplete]="'off'"></ui-input>
+        <ui-select [label]="'Type'" [(value)]="shopType">
+            <option [value]="ShopTypeEnum.CAFE">Cafe</option>
+            <option [value]="ShopTypeEnum.RESTAURANT">Restaurant</option>
+            <option [value]="ShopTypeEnum.SHOP">Shop</option>
+        </ui-select>
 
         <ui-input [label]="'Address'" [(value)]="shopAddress" [type]="'text'" [name]="'shop-address'" [autocomplete]="'off'"></ui-input>
 

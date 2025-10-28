@@ -4,14 +4,18 @@ import { Title } from "@shared/components/title/title";
 import { CurrencyPipe, DatePipe } from "@angular/common";
 import { OrderItemType, OrderType } from "@shared/types/OrderType";
 import { OrderStatusEnum } from "@shared/types/OrderType";
-import { ShopTypeEnum } from "@shared/types/ShopType";
+import { ShopType, ShopTypeEnum } from "@shared/types/ShopType";
 import { Popup } from "@shared/components/popup/popup";
 import { OrdersService } from "@shared/services/orders.service";
 import { Input } from "@shared/components/input/input";
+import { Select } from "@shared/components/select/select";
+import { ProductsService } from "@shared/services/products.service";
+import { ShopsService } from "@shared/services/shops.service";
+import { ProductType } from "@shared/types/ProductType";
 
 @Component({
     selector: "app-orders",
-    imports: [Title, Button, DatePipe, CurrencyPipe, Popup, Input],
+    imports: [Title, Button, DatePipe, CurrencyPipe, Popup, Input, Select],
     templateUrl: "./orders.html",
     styleUrl: "./orders.css",
 })
@@ -27,7 +31,7 @@ export class Orders implements OnInit {
 
     protected editingOrderId: WritableSignal<number | null> = signal(null);
 
-    protected orderEstablishmentId: WritableSignal<number> = signal(0);
+    protected orderEstablishmentId: WritableSignal<string> = signal("");
     protected orderStatus: WritableSignal<OrderStatusEnum> = signal(OrderStatusEnum.NEW);
 
 
@@ -38,114 +42,45 @@ export class Orders implements OnInit {
 
     protected editingOrderItemId: WritableSignal<number | null> = signal(null);
 
-    protected orderItemProductId: WritableSignal<number> = signal(0);
+    protected orderItemProductId: WritableSignal<string> = signal("");
     protected orderItemQuantity: WritableSignal<number> = signal(1);
 
 
     protected OrderStatusEnum = OrderStatusEnum;
     protected ShopTypeEnum = ShopTypeEnum;
 
+    protected products: WritableSignal<ProductType[]> = signal([]);
+    protected shops: WritableSignal<ShopType[]> = signal([]);
+
     private ordersService: OrdersService = inject(OrdersService);
+    private productsService: ProductsService = inject(ProductsService);
+    private shopsService: ShopsService = inject(ShopsService);
 
     ngOnInit(): void {
         this.loadOrders();
+
+        this.loadProducts();
+        this.loadShops();
     }
 
     private loadOrders(): void {
-        // const sampleOrders: OrderType[] = [
-        //     {
-        //         order_id: 2,
-        //         establishment: {
-        //             establishment_id: 102,
-        //             name: "Restaurant Example",
-        //             phone: "987-654-3210",
-        //             email: "another@example.com",
-        //             type: ShopTypeEnum.RESTAURANT,
-        //             address: "456 Another Ave",
-        //         },
-        //         date: "2024-02-15T18:30:00Z",
-        //         status: OrderStatusEnum.CONFIRMED,
-        //         orderProducts: [
-        //             {
-        //                 order_id: 2,
-        //                 product: {
-        //                     product_id: 203,
-        //                     name: "Food Item",
-        //                     price: 14.99,
-        //                     available_quantity: 200,
-        //                     wholesale_price: 12.99,
-        //                     wholesale_minimum_quantity: 20,
-        //                     is_active: true,
-        //                 },
-        //                 quantity: 3,
-        //                 price: 44.97,
-        //             },
-        //         ],
-        //     },
-        //     {
-        //         order_id: 1,
-        //         establishment: {
-        //             establishment_id: 101,
-        //             name: "Sample Shop",
-        //             phone: "123-456-7890",
-        //             email: "sample@example.com",
-        //             type: ShopTypeEnum.SHOP,
-        //             address: "123 Sample St",
-        //         },
-        //         date: "2024-01-01T12:00:00Z",
-        //         status: OrderStatusEnum.DELIVERED,
-        //         orderProducts: [
-        //             {
-        //                 order_id: 1,
-        //                 product: {
-        //                     product_id: 201,
-        //                     name: "Sample Product",
-        //                     price: 19.99,
-        //                     available_quantity: 100,
-        //                     wholesale_price: 15.99,
-        //                     wholesale_minimum_quantity: 10,
-        //                     is_active: true,
-        //                 },
-        //                 quantity: 2,
-        //                 price: 39.98,
-        //             },
-        //             {
-        //                 order_id: 1,
-        //                 product: {
-        //                     product_id: 202,
-        //                     name: "Another Product",
-        //                     price: 9.99,
-        //                     available_quantity: 50,
-        //                     wholesale_price: 7.99,
-        //                     wholesale_minimum_quantity: 5,
-        //                     is_active: true,
-        //                 },
-        //                 quantity: 1,
-        //                 price: 9.99,
-        //             },
-        //             {
-        //                 order_id: 1,
-        //                 product: {
-        //                     product_id: 204,
-        //                     name: "Extra Product",
-        //                     price: 4.99,
-        //                     available_quantity: 75,
-        //                     wholesale_price: 3.99,
-        //                     wholesale_minimum_quantity: 8,
-        //                     is_active: true,
-        //                 },
-        //                 quantity: 5,
-        //                 price: 24.95,
-        //             }
-        //         ],
-        //     },
-        // ];
-
-        // this.orders.set(sampleOrders);
-
         this.ordersService.getOrders()
             .then((orders: OrderType[]) => {
                 this.orders.set(orders);
+            });
+    }
+
+    private loadProducts(): void {
+        this.productsService.getProducts("name", "asc", "")
+            .then((products: ProductType[]) => {
+                this.products.set(products);
+            });
+    }
+
+    private loadShops(): void {
+        this.shopsService.getShops()
+            .then((shops: ShopType[]) => {
+                this.shops.set(shops);
             });
     }
 
@@ -171,7 +106,7 @@ export class Orders implements OnInit {
     }
 
     protected openOrderCreationPopup(): void {
-        this.orderEstablishmentId.set(0);
+        this.orderEstablishmentId.set(this.shops()[0].establishment_id.toString());
         this.orderStatus.set(OrderStatusEnum.NEW);
 
         this.orderPopupTitle.set("Create New Order");
@@ -182,7 +117,7 @@ export class Orders implements OnInit {
         event.preventDefault();
 
         const newOrder: Pick<OrderType, "status" | "date"> & { establishment_id: number } = {
-            establishment_id: this.orderEstablishmentId(),
+            establishment_id: +this.orderEstablishmentId(),
             status: this.orderStatus(),
         };
 
@@ -202,7 +137,7 @@ export class Orders implements OnInit {
 
         this.editingOrderId.set(id);
 
-        this.orderEstablishmentId.set(orderToEdit.establishment.establishment_id);
+        this.orderEstablishmentId.set(orderToEdit.establishment.establishment_id.toString());
         this.orderStatus.set(orderToEdit.status);
 
         this.orderPopupTitle.set("Edit Order");
@@ -213,7 +148,7 @@ export class Orders implements OnInit {
         event.preventDefault();
 
         const updatedOrderData: Pick<OrderType, "status"> & { establishment_id: number } = {
-            establishment_id: this.orderEstablishmentId(),
+            establishment_id: +this.orderEstablishmentId(),
             status: this.orderStatus(),
         };
 
@@ -244,7 +179,7 @@ export class Orders implements OnInit {
     protected openOrderItemCreationPopup(orderId: number): void {
         this.editingOrderId.set(orderId);
 
-        this.orderItemProductId.set(0);
+        this.orderItemProductId.set(this.products()[0].product_id.toString());
         this.orderItemQuantity.set(1);
 
         this.orderItemPopupTitle.set("Add Order Item");
@@ -255,7 +190,7 @@ export class Orders implements OnInit {
         event.preventDefault();
 
         const newOrderItem: Pick<OrderItemType, "quantity"> & { product_id: number } = {
-            product_id: this.orderItemProductId(),
+            product_id: +this.orderItemProductId(),
             quantity: this.orderItemQuantity(),
         };
 
@@ -277,7 +212,7 @@ export class Orders implements OnInit {
 
         this.editingOrderId.set(orderId);
 
-        this.orderItemProductId.set(orderItemId);
+        this.orderItemProductId.set(orderItemId.toString());
         this.orderItemQuantity.set(orderItemToEdit.quantity);
 
         this.orderItemPopupTitle.set("Edit Order Item");
@@ -291,7 +226,7 @@ export class Orders implements OnInit {
             quantity: this.orderItemQuantity(),
         };
 
-        this.ordersService.updateOrderItem(this.editingOrderId()!, this.orderItemProductId()!, updatedOrderData)
+        this.ordersService.updateOrderItem(this.editingOrderId()!, +this.orderItemProductId()!, updatedOrderData)
             .then(() => {
                 this.loadOrders();
                 this.isOrderItemEditingPopupOpen.set(false);
