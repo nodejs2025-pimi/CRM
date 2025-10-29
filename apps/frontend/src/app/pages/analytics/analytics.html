@@ -1,1 +1,84 @@
-<p>analytics works!</p>
+<div class="analytics">
+    <div class="analytics__header">
+        <ui-title [title]="'Analytics'"></ui-title>
+
+        <ui-button [label]="'Download analytics'" [icon]="'fa-regular fa-circle-down'" [type]="'primary'"></ui-button>
+    </div>
+
+    <div class="analytics__main">
+        <div class="main__numbers">
+            <div class="numbers__block number-block">
+                <span>Total revenue</span>
+                <span>{{ totalRevenue() }} $</span>
+            </div>
+
+            <div class="numbers__block number-block">
+                <span>Average order price</span>
+                <span>{{ averageOrderPrice() }} $</span>
+            </div>
+
+            <div class="numbers__block number-block">
+                <span>Month revenue</span>
+                <span>{{ monthRevenue() }} $</span>
+            </div>
+
+            <div class="numbers__block number-block">
+                <span>Previous month revenue</span>
+                <span>{{ prevMonthRevenue() }} $</span>
+            </div>
+
+            <div class="number-block-wrapper">
+                <span>Top product of week</span>
+
+                <div class="numbers__block number-block">
+                    <span>Name</span>
+                    @if (topProduct() && topProduct()!.product) {
+                    <span>{{ topProduct()!.product.name }}</span>
+                    }
+                </div>
+
+                <div class="numbers__block number-block">
+                    <span>Sold</span>
+                    @if (topProduct()) {
+                    <span>{{ topProduct()!.sold }}</span>
+                    }
+                </div>
+            </div>
+
+            <div class="number-block-wrapper">
+                <span>Top establishment of week</span>
+
+                <div class="numbers__block number-block">
+                    <span>Name</span>
+                    @if (topBuyer() && topBuyer()!.shop) {
+                    <span>{{ topBuyer()!.shop.name }}</span>
+                    }
+                </div>
+
+                <div class="numbers__block number-block">
+                    <span>Revenue</span>
+                    @if (topBuyer()) {
+                    <span>{{ topBuyer()!.total }}</span>
+                    }
+                </div>
+            </div>
+
+            <div class="numbers__block number-block">
+                <span>Products availibility</span>
+                <span>{{ productsAvailibility() * 100 }}%</span>
+            </div>
+        </div>
+
+        <div class="main__charts">
+            <div class="charts__chart-wrapper chart">
+                <span class="chart__title">Revenue by month</span>
+                <canvas class="chart__canvas" #revenueByMonth ></canvas>
+            </div>
+            
+            <div class="charts__chart-wrapper chart">
+                <span class="chart__title">Establishment count</span>
+                <canvas class="chart__canvas" #establishmentCount ></canvas>
+            </div>
+        </div>
+    </div>
+</div>
