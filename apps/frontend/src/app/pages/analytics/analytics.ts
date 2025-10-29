@@ -184,7 +184,7 @@ export class Analytics implements OnInit {
             }
         });
 
-        return totalProductCount / activeProductCount;
+        return activeProductCount / totalProductCount;
     });
 
     @ViewChild("revenueByMonth") revenueByMonthRef!: ElementRef<HTMLCanvasElement>;
