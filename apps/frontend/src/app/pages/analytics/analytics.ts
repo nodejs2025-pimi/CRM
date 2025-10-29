@@ -1,3 +1,4 @@
+import { CurrencyPipe } from "@angular/common";
 import {
     Component,
     computed,
@@ -14,7 +15,7 @@ import { Title } from "@shared/components/title/title";
 import { OrdersService } from "@shared/services/orders.service";
 import { ProductsService } from "@shared/services/products.service";
 import { ShopsService } from "@shared/services/shops.service";
-import { OrderItemType, OrderStatusEnum, OrderType } from "@shared/types/OrderType";
+import { OrderItemType, OrderType } from "@shared/types/OrderType";
 import { ProductType } from "@shared/types/ProductType";
 import { ShopType, ShopTypeEnum } from "@shared/types/ShopType";
 import { Chart, registerables } from "chart.js";
@@ -25,7 +26,7 @@ Chart.register(...registerables);
 
 @Component({
     selector: "app-analytics",
-    imports: [Title, Button],
+    imports: [Title, Button, CurrencyPipe],
     templateUrl: "./analytics.html",
     styleUrl: "./analytics.css",
 })
@@ -37,7 +38,7 @@ export class Analytics implements OnInit {
     protected readonly totalRevenue: Signal<number> = computed<number>(() => {
         return this.orders().reduce((sum: number, order: OrderType) => {
             const orderTotal = order.orderProducts.reduce(
-                (acc: number, item: OrderItemType) => acc + item.price * item.quantity,
+                (acc: number, item: OrderItemType) => acc + item.price,
                 0,
             );
 
@@ -63,7 +64,7 @@ export class Analytics implements OnInit {
                 new Date(order.date).getFullYear() == new Date().getFullYear()
             ) {
                 const orderTotal = order.orderProducts.reduce(
-                    (acc: number, item: OrderItemType) => acc + item.price * item.quantity,
+                    (acc: number, item: OrderItemType) => acc + item.price,
                     0,
                 );
 
@@ -86,7 +87,7 @@ export class Analytics implements OnInit {
                 new Date(order.date).getFullYear() == prevYear
             ) {
                 const orderTotal = order.orderProducts.reduce(
-                    (acc: number, item: OrderItemType) => acc + item.price * item.quantity,
+                    (acc: number, item: OrderItemType) => acc + item.price,
                     0,
                 );
 
@@ -156,7 +157,7 @@ export class Analytics implements OnInit {
             const shop = order.establishment;
             const shopId = shop.establishment_id;
 
-            const orderTotal = order.orderProducts.reduce((sum, item) => sum + item.price * item.quantity, 0);
+            const orderTotal = order.orderProducts.reduce((sum, item) => sum + item.price, 0);
 
             const current = totals.get(shopId);
             if (current) {
@@ -195,30 +196,31 @@ export class Analytics implements OnInit {
     private readonly productsService: ProductsService = inject(ProductsService);
     private readonly shopsService: ShopsService = inject(ShopsService);
 
-    ngOnInit(): void {
-        this.loadOrders();
-        this.loadProducts();
-        this.loadShops();
+    async ngOnInit(): Promise<void> {
+        await Promise.all([
+            this.loadOrders(),
+            this.loadProducts(),
+            this.loadShops(),
+        ]);
+
+        this.initOrdersChart();
+        this.initShopsChart();
     }
 
-    private loadOrders(): void {
-        this.ordersService.getOrders().then((orders: OrderType[]) => {
+    private async loadOrders(): Promise<void> {
+        await this.ordersService.getOrders().then((orders: OrderType[]) => {
             this.orders.set(orders);
         });
-        setTimeout(() => {
-            this.initOrdersChart();
-            this.initShopsChart();
-        }, 2000);
     }
 
-    private loadProducts(): void {
-        this.productsService.getProducts("name", "asc", "").then((products: ProductType[]) => {
+    private async loadProducts(): Promise<void> {
+        await this.productsService.getProducts("name", "asc", "").then((products: ProductType[]) => {
             this.products.set(products);
         });
     }
 
-    private loadShops(): void {
-        this.shopsService.getShops().then((shops: ShopType[]) => {
+    private async loadShops(): Promise<void> {
+        await this.shopsService.getShops().then((shops: ShopType[]) => {
             this.shops.set(shops);
         });
     }
@@ -227,67 +229,6 @@ export class Analytics implements OnInit {
         const ctx: HTMLCanvasElement = this.revenueByMonthRef.nativeElement;
 
         const monthlyRevenue = new Array(12).fill(0);
-
-        this.orders.set([
-            {
-                date: "11/03/2025",
-                order_id: 1,
-                establishment: {
-                    address: "Sgsg",
-                    email: "asgasg",
-                    establishment_id: 1,
-                    name: "shop",
-                    phone: "09136216126",
-                    type: ShopTypeEnum.SHOP,
-                },
-                status: OrderStatusEnum.CONFIRMED,
-                orderProducts: [
-                    {
-                        price: 1000,
-                        quantity: 2,
-                        order_id: 1,
-                        product: {
-                            available_quantity: 4,
-                            is_active: true,
-                            name: "name",
-                            price: 12,
-                            product_id: 1,
-                            wholesale_minimum_quantity: 10,
-                            wholesale_price: 10,
-                        },
-                    },
-                ],
-            },
-            {
-                date: "10/13/2025",
-                order_id: 1,
-                establishment: {
-                    address: "Sgsg",
-                    email: "asgasg",
-                    establishment_id: 1,
-                    name: "shop",
-                    phone: "09136216126",
-                    type: ShopTypeEnum.SHOP,
-                },
-                status: OrderStatusEnum.CONFIRMED,
-                orderProducts: [
-                    {
-                        price: 800,
-                        quantity: 5,
-                        order_id: 1,
-                        product: {
-                            available_quantity: 4,
-                            is_active: true,
-                            name: "name3",
-                            price: 12,
-                            product_id: 1,
-                            wholesale_minimum_quantity: 10,
-                            wholesale_price: 10,
-                        },
-                    },
-                ],
-            },
-        ]);
 
         this.orders().forEach((order: OrderType) => {
             if (!order.date) {
@@ -298,8 +239,6 @@ export class Analytics implements OnInit {
             const total = order.orderProducts.reduce((sum, item) => sum + item.price * item.quantity, 0);
             monthlyRevenue[month] += total;
         });
-
-        console.log(monthlyRevenue);
 
         new Chart(ctx, {
             type: "bar",
@@ -319,7 +258,7 @@ export class Analytics implements OnInit {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: (context) => `$ ${context.parsed.y!.toLocaleString()}`,
+                            label: (context) => `₴ ${context.parsed.y!.toLocaleString()}`,
                         },
                     },
                     legend: {
@@ -331,7 +270,7 @@ export class Analytics implements OnInit {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: "Revenue ($)",
+                            text: "Revenue (₴)",
                             color: "#a1a1a1",
                         },
                         grid: {
@@ -370,38 +309,9 @@ export class Analytics implements OnInit {
             [ShopTypeEnum.SHOP]: 0,
         };
 
-        this.shops.set([
-            {
-                address: "asgsag",
-                email: "asg",
-                establishment_id: 1,
-                name: "ShopName",
-                phone: "09215215215",
-                type: ShopTypeEnum.CAFE,
-            },
-            {
-                address: "asgsag",
-                email: "asg",
-                establishment_id: 2,
-                name: "ShopName2",
-                phone: "09219199015",
-                type: ShopTypeEnum.CAFE,
-            },
-            {
-                address: "asgsag",
-                email: "asg",
-                establishment_id: 3,
-                name: "ShopName3",
-                phone: "09215988015",
-                type: ShopTypeEnum.SHOP,
-            },
-        ]);
-
         this.shops().forEach((establishment: ShopType) => {
             establishmentByType[establishment.type]++;
         });
-
-        console.log(establishmentByType);
 
         new Chart(ctx, {
             type: "bar",
@@ -420,7 +330,7 @@ export class Analytics implements OnInit {
                 plugins: {
                     tooltip: {
                         callbacks: {
-                            label: (context) => `$ ${context.parsed.y!.toLocaleString()}`,
+                            label: (context) => `${context.parsed.y!.toLocaleString()}`,
                         },
                     },
                     legend: {

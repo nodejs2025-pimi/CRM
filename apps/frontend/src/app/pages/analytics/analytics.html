@@ -9,22 +9,22 @@
         <div class="main__numbers">
             <div class="numbers__block number-block">
                 <span>Total revenue</span>
-                <span>{{ totalRevenue() }} $</span>
+                <span>{{ totalRevenue() | currency: 'UAH' }}</span>
             </div>
 
             <div class="numbers__block number-block">
                 <span>Average order price</span>
-                <span>{{ averageOrderPrice() }} $</span>
+                <span>{{ averageOrderPrice() | currency: 'UAH' }}</span>
             </div>
 
             <div class="numbers__block number-block">
                 <span>Month revenue</span>
-                <span>{{ monthRevenue() }} $</span>
+                <span>{{ monthRevenue() | currency: 'UAH' }}</span>
             </div>
 
             <div class="numbers__block number-block">
                 <span>Previous month revenue</span>
-                <span>{{ prevMonthRevenue() }} $</span>
+                <span>{{ prevMonthRevenue() | currency: 'UAH' }}</span>
             </div>
 
             <div class="number-block-wrapper">
