@@ -18,6 +18,8 @@ import { OrderItemType, OrderStatusEnum, OrderType } from "@shared/types/OrderTy
 import { ProductType } from "@shared/types/ProductType";
 import { ShopType, ShopTypeEnum } from "@shared/types/ShopType";
 import { Chart, registerables } from "chart.js";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 Chart.register(...registerables);
 
@@ -187,6 +189,7 @@ export class Analytics implements OnInit {
 
     @ViewChild("revenueByMonth") revenueByMonthRef!: ElementRef<HTMLCanvasElement>;
     @ViewChild("establishmentCount") establishmentCountRef!: ElementRef<HTMLCanvasElement>;
+    @ViewChild("analytics") analytics!: ElementRef<HTMLElement>;
 
     private readonly ordersService: OrdersService = inject(OrdersService);
     private readonly productsService: ProductsService = inject(ProductsService);
@@ -374,7 +377,7 @@ export class Analytics implements OnInit {
                 establishment_id: 1,
                 name: "ShopName",
                 phone: "09215215215",
-                type: ShopTypeEnum.CAFE
+                type: ShopTypeEnum.CAFE,
             },
             {
                 address: "asgsag",
@@ -382,7 +385,7 @@ export class Analytics implements OnInit {
                 establishment_id: 2,
                 name: "ShopName2",
                 phone: "09219199015",
-                type: ShopTypeEnum.CAFE
+                type: ShopTypeEnum.CAFE,
             },
             {
                 address: "asgsag",
@@ -390,9 +393,9 @@ export class Analytics implements OnInit {
                 establishment_id: 3,
                 name: "ShopName3",
                 phone: "09215988015",
-                type: ShopTypeEnum.SHOP
-            }
-        ])
+                type: ShopTypeEnum.SHOP,
+            },
+        ]);
 
         this.shops().forEach((establishment: ShopType) => {
             establishmentByType[establishment.type]++;
@@ -456,6 +459,20 @@ export class Analytics implements OnInit {
                     },
                 },
             },
+        });
+    }
+
+    protected downloadPDF(): void {
+        html2canvas(this.analytics.nativeElement, { scale: 2, backgroundColor: "#ffffff" }).then((canvas) => {
+            const imgData = canvas.toDataURL("image/png");
+            const pdf = new jsPDF("p", "mm", "a4");
+
+            const pageWidth = pdf.internal.pageSize.getWidth();
+            const imgWidth = pageWidth - 20;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+            pdf.addImage(imgData, "PNG", 10, 10, imgWidth, imgHeight);
+            pdf.save(`analytics-report-${new Date().toISOString().slice(0, 10)}.pdf`);
         });
     }
 }

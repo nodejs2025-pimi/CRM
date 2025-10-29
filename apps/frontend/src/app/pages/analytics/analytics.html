@@ -2,10 +2,10 @@
     <div class="analytics__header">
         <ui-title [title]="'Analytics'"></ui-title>
 
-        <ui-button [label]="'Download analytics'" [icon]="'fa-regular fa-circle-down'" [type]="'primary'"></ui-button>
+        <ui-button [label]="'Download analytics'" [icon]="'fa-regular fa-circle-down'" [type]="'primary'" (click)="downloadPDF()"></ui-button>
     </div>
 
-    <div class="analytics__main">
+    <div class="analytics__main" #analytics>
         <div class="main__numbers">
             <div class="numbers__block number-block">
                 <span>Total revenue</span>
