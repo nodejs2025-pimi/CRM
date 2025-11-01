@@ -13,6 +13,7 @@ import {
   ApiOkResponse,
   ApiNotFoundResponse,
   ApiNoContentResponse,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { ParseIntPipe } from '@nestjs/common';
 import { CreateEstablishmentDto } from './dtos/create-establishment.dto';
@@ -21,6 +22,7 @@ import { EstablishmentService } from './establishment.service';
 import { GetEstablishmentDto } from './dtos/get-establishment.dto';
 
 @Controller('establishments')
+@ApiBearerAuth()
 export class EstablishmentController {
   constructor(private readonly establishmentService: EstablishmentService) {}
 

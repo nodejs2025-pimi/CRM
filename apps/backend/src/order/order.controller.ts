@@ -6,6 +6,7 @@ import {
   ApiNotFoundResponse,
   ApiNoContentResponse,
   ApiOperation,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dtos/create-order.dto';
@@ -14,6 +15,7 @@ import { AddOrderProductDto } from './dtos/add-order-product.dto';
 import { GetOrderProductDto } from './dtos/get-order-product.dto';
 
 @Controller('orders')
+@ApiBearerAuth()
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
