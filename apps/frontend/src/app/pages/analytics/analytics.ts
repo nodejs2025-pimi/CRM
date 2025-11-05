@@ -373,11 +373,16 @@ export class Analytics implements OnInit {
     }
 
     protected downloadPDF(): void {
-        html2canvas(this.analytics.nativeElement, { scale: 2, backgroundColor: "#ffffff" }).then((canvas) => {
+        html2canvas(this.analytics.nativeElement, { scale: 2, backgroundColor: "#2a2a3d" }).then((canvas) => {
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF("p", "mm", "a4");
 
             const pageWidth = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+
+            pdf.setFillColor("#2a2a3d");
+            pdf.rect(0, 0, pageWidth, pageHeight, "F");
+
             const imgWidth = pageWidth - 20;
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
