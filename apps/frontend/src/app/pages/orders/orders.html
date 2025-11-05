@@ -2,7 +2,12 @@
     <div class="orders__header">
         <ui-title [title]="'Orders'"></ui-title>
 
-        <ui-button [label]="'Add order'" [icon]="'fa-solid fa-plus'" [type]="'primary'" (click)="openOrderCreationPopup()"></ui-button>
+        <ui-button
+            [label]="'Add order'"
+            [icon]="'fa-solid fa-plus'"
+            [type]="'primary'"
+            (click)="openOrderCreationPopup()"
+        ></ui-button>
     </div>
 
     <div class="orders__list">
@@ -30,27 +35,51 @@
                         } {{ order.establishment.name }}
                     </span>
 
-                    <span class="info__column info__column_centered info__date">{{ order.date | date: "dd MMM y":"":"en-US" }}</span>
+                    <span class="info__column info__column_centered info__date"
+                        >{{ order.date | date: "dd MMM y":"":"en-US" }}</span
+                    >
 
                     @if (order.status === OrderStatusEnum.NEW) {
                     <span class="info__column info__column_centered info__status info__status_new">New</span>
                     } @else if (order.status === OrderStatusEnum.CONFIRMED) {
-                    <span class="info__column info__column_centered info__status info__status_confirmed">Confirmed</span>
+                    <span class="info__column info__column_centered info__status info__status_confirmed"
+                        >Confirmed</span
+                    >
                     } @else if (order.status === OrderStatusEnum.DELIVERED) {
-                    <span class="info__column info__column_centered info__status info__status_delivered">Delivered</span>
+                    <span class="info__column info__column_centered info__status info__status_delivered"
+                        >Delivered</span
+                    >
                     }
 
-                    <span class="info__column info__column_centered info__price">{{ getTotalOrderPrice(order) | currency: "UAH" }}</span>
+                    <span class="info__column info__column_centered info__price"
+                        >{{ getTotalOrderPrice(order) | currency: "UAH" }}</span
+                    >
                 </div>
 
-                <ui-button [icon]="'fa-solid fa-pen'" [type]="'primary-line'" (click)="editOrder(order.order_id)"></ui-button>
+                <ui-button
+                    [icon]="'fa-solid fa-pen'"
+                    [type]="'primary-line'"
+                    (click)="editOrder(order.order_id)"
+                ></ui-button>
 
-                <ui-button [icon]="'fa-solid fa-trash'" [type]="'primary-line'" (click)="deleteOrder(order.order_id)"></ui-button>
+                <ui-button
+                    [icon]="'fa-solid fa-trash'"
+                    [type]="'primary-line'"
+                    (click)="deleteOrder(order.order_id)"
+                ></ui-button>
 
                 @if (isOrderOpened(order.order_id)) {
-                <ui-button [icon]="'fa-solid fa-chevron-up'" [type]="'primary-line'" (click)="toggleOrderDetails(order.order_id)"></ui-button>
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-up'"
+                    [type]="'primary-line'"
+                    (click)="toggleOrderDetails(order.order_id)"
+                ></ui-button>
                 } @else {
-                <ui-button [icon]="'fa-solid fa-chevron-down'" [type]="'primary-line'" (click)="toggleOrderDetails(order.order_id)"></ui-button>
+                <ui-button
+                    [icon]="'fa-solid fa-chevron-down'"
+                    [type]="'primary-line'"
+                    (click)="toggleOrderDetails(order.order_id)"
+                ></ui-button>
                 }
             </div>
 
@@ -67,7 +96,15 @@
                 @for(item of order.orderProducts; track item.product.product_id) {
                 <div class="order__item">
                     <span class="item__column item__name">{{ item.product.name }}</span>
-                    <span class="item__column item__price">{{ item.quantity }} pcs. × {{ item.product.price | currency: "UAH" }}</span>
+                    @if (item.quantity > item.product.wholesale_minimum_quantity) {
+                    <span class="item__column item__price">
+                        {{ item.quantity }} pcs. × {{ item.product.price | currency: "UAH" }}
+                    </span>
+                    } @else {
+                    <span class="item__column item__price">
+                        {{item.quantity}} pcs. × {{ item.product.wholesale_price | currency: "UAH" }}
+                    </span>
+                    }
                     <span class="item__column item__total">{{ item.price | currency: "UAH" }}</span>
 
                     <ui-button
@@ -89,7 +126,11 @@
     </div>
 </div>
 
-<ui-popup [isOpen]="isOrderCreationPopupOpen() || isOrderEditingPopupOpen()" [title]="orderPopupTitle()" (closePopup)="onOrderPopupClose()">
+<ui-popup
+    [isOpen]="isOrderCreationPopupOpen() || isOrderEditingPopupOpen()"
+    [title]="orderPopupTitle()"
+    (closePopup)="onOrderPopupClose()"
+>
     <form class="popup__form">
         <ui-select [label]="'Establishment'" [(value)]="orderEstablishmentId" [isDisabled]="isOrderEditingPopupOpen()">
             @for(shop of shops(); track shop.establishment_id) {
@@ -104,9 +145,21 @@
         </ui-select>
 
         @if (isOrderEditingPopupOpen()) {
-        <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateOrder($event)"></ui-button>
+        <ui-button
+            class="form__submit"
+            [label]="'Update'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="updateOrder($event)"
+        ></ui-button>
         } @else {
-        <ui-button class="form__submit" [label]="'Create'" [type]="'primary'" [isFullWidth]="true" (click)="createOrder($event)"></ui-button>
+        <ui-button
+            class="form__submit"
+            [label]="'Create'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="createOrder($event)"
+        ></ui-button>
         }
     </form>
 </ui-popup>
@@ -133,9 +186,21 @@
         ></ui-input>
 
         @if (isOrderItemEditingPopupOpen()) {
-        <ui-button class="form__submit" [label]="'Update'" [type]="'primary'" [isFullWidth]="true" (click)="updateOrderItem($event)"></ui-button>
+        <ui-button
+            class="form__submit"
+            [label]="'Update'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="updateOrderItem($event)"
+        ></ui-button>
         } @else {
-        <ui-button class="form__submit" [label]="'Create'" [type]="'primary'" [isFullWidth]="true" (click)="addOrderItem($event)"></ui-button>
+        <ui-button
+            class="form__submit"
+            [label]="'Create'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="addOrderItem($event)"
+        ></ui-button>
         }
     </form>
 </ui-popup>
