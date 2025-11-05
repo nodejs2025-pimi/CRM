@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -64,12 +68,27 @@ export class OrderService {
 
   async removeOrderProduct(orderId: number, productId: number) {
     const orderProduct = await this.getOrderProduct(orderId, productId);
+    const product = await this.productService.getById(productId);
+
+    await this.productService.update(productId, {
+      available_quantity: product.available_quantity + orderProduct.quantity,
+    });
 
     await this.orderProduct.remove(orderProduct);
   }
 
   async deleteOrder(id: number) {
     const order = await this.getOrderById(id);
+
+    for (const orderProduct of order.orderProducts) {
+      const product = await this.productService.getById(
+        orderProduct.product_id,
+      );
+
+      await this.productService.update(orderProduct.product_id, {
+        available_quantity: product.available_quantity + orderProduct.quantity,
+      });
+    }
 
     await this.order.remove(order);
   }
@@ -81,13 +100,30 @@ export class OrderService {
   ) {
     const orderProduct = await this.getOrderProduct(orderId, productId);
     const product = await this.productService.getById(productId);
+    const oldQuantity = orderProduct.quantity;
+
+    if (dto.quantity) {
+      const quantityDifference = dto.quantity - oldQuantity;
+
+      if (quantityDifference > product.available_quantity) {
+        throw new BadRequestException(
+          `Only ${product.available_quantity} items available in stock.`,
+        );
+      }
+
+      await this.productService.update(productId, {
+        available_quantity: product.available_quantity - quantityDifference,
+      });
+    }
 
     Object.assign(orderProduct, dto);
 
-    orderProduct.price = this.calculateOrderProductPrice(
-      product,
-      orderProduct.quantity,
-    );
+    if (dto.quantity) {
+      orderProduct.price = this.calculateOrderProductPrice(
+        product,
+        orderProduct.quantity,
+      );
+    }
 
     return this.orderProduct.save(orderProduct);
   }
@@ -116,16 +152,34 @@ export class OrderService {
 
   async addOrderProduct(id: number, dto: AddOrderProductDto) {
     const productId = dto.product_id;
-    const order = await this.getOrderById(id);
+
+    try {
+      await this.getOrderProduct(id, productId);
+
+      return this.updateOrderProduct(id, productId, dto);
+    } catch (error) {
+      if (!(error instanceof NotFoundException)) {
+        throw error;
+      }
+    }
+
     const product = await this.productService.getById(productId);
 
-    const price = this.calculateOrderProductPrice(product, dto.quantity);
+    if (dto.quantity > product.available_quantity) {
+      throw new BadRequestException(
+        `Only ${product.available_quantity} items available in stock.`,
+      );
+    }
+
+    await this.productService.update(productId, {
+      available_quantity: product.available_quantity - dto.quantity,
+    });
 
     const orderProduct = this.orderProduct.create({
-      ...dto,
-      order_id: order.order_id,
-      product_id: product.product_id,
-      price,
+      order_id: id,
+      product_id: productId,
+      quantity: dto.quantity,
+      price: this.calculateOrderProductPrice(product, dto.quantity),
     });
 
     return this.orderProduct.save(orderProduct);
