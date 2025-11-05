@@ -24,8 +24,8 @@ export class Order {
   establishment_id: number;
 
   @Column({
-    type: 'date',
-    default: () => 'CURRENT_DATE',
+    type: 'timestamptz',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   date: Date;
 
