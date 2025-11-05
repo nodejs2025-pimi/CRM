@@ -9,6 +9,7 @@ import { AddOrderProductDto } from './dtos/add-order-product.dto';
 import { ProductService } from '../product/product.service';
 import { UpdateOrderProductDto } from './dtos/update-order-product.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
+import { Product } from '../product/entities/product.entity';
 
 @Injectable()
 export class OrderService {
@@ -57,6 +58,7 @@ export class OrderService {
   async getAllOrders() {
     return this.order.find({
       relations: { orderProducts: { product: true }, establishment: true },
+      order: { date: 'DESC' },
     });
   }
 
@@ -78,8 +80,14 @@ export class OrderService {
     dto: UpdateOrderProductDto,
   ) {
     const orderProduct = await this.getOrderProduct(orderId, productId);
+    const product = await this.productService.getById(productId);
 
     Object.assign(orderProduct, dto);
+
+    orderProduct.price = this.calculateOrderProductPrice(
+      product,
+      orderProduct.quantity,
+    );
 
     return this.orderProduct.save(orderProduct);
   }
@@ -111,15 +119,7 @@ export class OrderService {
     const order = await this.getOrderById(id);
     const product = await this.productService.getById(productId);
 
-    let price: number;
-
-    if (dto.quantity >= product.wholesale_minimum_quantity) {
-      price = product.wholesale_price * dto.quantity;
-    } else {
-      price = product.price * dto.quantity;
-    }
-
-    price = parseFloat(price.toFixed(2));
+    const price = this.calculateOrderProductPrice(product, dto.quantity);
 
     const orderProduct = this.orderProduct.create({
       ...dto,
@@ -129,5 +129,17 @@ export class OrderService {
     });
 
     return this.orderProduct.save(orderProduct);
+  }
+
+  private calculateOrderProductPrice(product: Product, quantity: number) {
+    let price;
+
+    if (quantity >= product.wholesale_minimum_quantity) {
+      price = product.wholesale_price * quantity;
+    } else {
+      price = product.price * quantity;
+    }
+
+    return parseFloat(price.toFixed(2));
   }
 }
