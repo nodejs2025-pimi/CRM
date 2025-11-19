@@ -123,7 +123,7 @@ describe('ProductService', () => {
   });
 
   describe('getById', () => {
-    it('should return a product if found', async () => {
+    it('should return product by id', async () => {
       const id = 1;
       const product = products.find((p) => p.product_id === id);
       mockProductRepository.findOne.mockResolvedValue(product);
@@ -136,7 +136,7 @@ describe('ProductService', () => {
       });
     });
 
-    it('should throw NotFoundException if not found', async () => {
+    it('should throw NotFoundException if product not found', async () => {
       mockProductRepository.findOne.mockResolvedValue(null);
 
       await expect(service.getById(999)).rejects.toThrow(NotFoundException);
@@ -144,7 +144,7 @@ describe('ProductService', () => {
   });
 
   describe('create', () => {
-    it('should successfully insert a product', async () => {
+    it('should create new product', async () => {
       const dto: CreateProductDto = {
         name: 'New Prod',
         price: 50,
