@@ -34,7 +34,6 @@ export class Orders implements OnInit {
     protected orderEstablishmentId: WritableSignal<string> = signal("");
     protected orderStatus: WritableSignal<OrderStatusEnum> = signal(OrderStatusEnum.NEW);
 
-
     protected isOrderItemCreationPopupOpen: WritableSignal<boolean> = signal(false);
     protected isOrderItemEditingPopupOpen: WritableSignal<boolean> = signal(false);
 
@@ -44,7 +43,6 @@ export class Orders implements OnInit {
 
     protected orderItemProductId: WritableSignal<string> = signal("");
     protected orderItemQuantity: WritableSignal<number> = signal(1);
-
 
     protected OrderStatusEnum = OrderStatusEnum;
     protected ShopTypeEnum = ShopTypeEnum;
@@ -64,24 +62,21 @@ export class Orders implements OnInit {
     }
 
     private loadOrders(): void {
-        this.ordersService.getOrders()
-            .then((orders: OrderType[]) => {
-                this.orders.set(orders);
-            });
+        this.ordersService.getOrders().then((orders: OrderType[]) => {
+            this.orders.set(orders);
+        });
     }
 
     private loadProducts(): void {
-        this.productsService.getProducts("name", "asc", "")
-            .then((products: ProductType[]) => {
-                this.products.set(products);
-            });
+        this.productsService.getProducts("name", "asc", "").then((products: ProductType[]) => {
+            this.products.set(products);
+        });
     }
 
     private loadShops(): void {
-        this.shopsService.getShops()
-            .then((shops: ShopType[]) => {
-                this.shops.set(shops);
-            });
+        this.shopsService.getShops().then((shops: ShopType[]) => {
+            this.shops.set(shops);
+        });
     }
 
     protected getTotalOrderPrice(order: OrderType): number {
@@ -93,8 +88,7 @@ export class Orders implements OnInit {
 
         if (openedOrdersSet.has(orderId)) {
             openedOrdersSet.delete(orderId);
-        }
-        else {
+        } else {
             openedOrdersSet.add(orderId);
         }
 
@@ -121,11 +115,10 @@ export class Orders implements OnInit {
             status: this.orderStatus(),
         };
 
-        this.ordersService.createOrder(newOrder)
-            .then(() => {
-                this.loadOrders();
-                this.isOrderCreationPopupOpen.set(false);
-            });
+        this.ordersService.createOrder(newOrder).then(() => {
+            this.loadOrders();
+            this.isOrderCreationPopupOpen.set(false);
+        });
     }
 
     protected editOrder(id: number): void {
@@ -152,11 +145,10 @@ export class Orders implements OnInit {
             status: this.orderStatus(),
         };
 
-        this.ordersService.updateOrder(this.editingOrderId()!, updatedOrderData)
-            .then(() => {
-                this.loadOrders();
-                this.isOrderEditingPopupOpen.set(false);
-            });
+        this.ordersService.updateOrder(this.editingOrderId()!, updatedOrderData).then(() => {
+            this.loadOrders();
+            this.isOrderEditingPopupOpen.set(false);
+        });
     }
 
     protected onOrderPopupClose(): void {
@@ -165,15 +157,14 @@ export class Orders implements OnInit {
     }
 
     protected deleteOrder(orderId: number): void {
-        this.ordersService.deleteOrder(orderId)
-            .then(() => {
-                this.loadOrders();
+        this.ordersService.deleteOrder(orderId).then(() => {
+            this.loadOrders();
 
-                this.openedOrders.update((openedOrdersSet: Set<number>) => {
-                    openedOrdersSet.delete(orderId);
-                    return openedOrdersSet;
-                });
+            this.openedOrders.update((openedOrdersSet: Set<number>) => {
+                openedOrdersSet.delete(orderId);
+                return openedOrdersSet;
             });
+        });
     }
 
     protected openOrderItemCreationPopup(orderId: number): void {
@@ -194,11 +185,10 @@ export class Orders implements OnInit {
             quantity: this.orderItemQuantity(),
         };
 
-        this.ordersService.addOrderItem(this.editingOrderId()!, newOrderItem)
-            .then(() => {
-                this.loadOrders();
-                this.isOrderItemCreationPopupOpen.set(false);
-            });
+        this.ordersService.addOrderItem(this.editingOrderId()!, newOrderItem).then(() => {
+            this.loadOrders();
+            this.isOrderItemCreationPopupOpen.set(false);
+        });
     }
 
     protected editOrderItem(orderId: number, orderItemId: number): void {
@@ -226,7 +216,8 @@ export class Orders implements OnInit {
             quantity: this.orderItemQuantity(),
         };
 
-        this.ordersService.updateOrderItem(this.editingOrderId()!, +this.orderItemProductId()!, updatedOrderData)
+        this.ordersService
+            .updateOrderItem(this.editingOrderId()!, +this.orderItemProductId()!, updatedOrderData)
             .then(() => {
                 this.loadOrders();
                 this.isOrderItemEditingPopupOpen.set(false);
@@ -239,9 +230,8 @@ export class Orders implements OnInit {
     }
 
     protected deleteOrderItem(orderId: number, productId: number): void {
-        this.ordersService.removeOrderItem(orderId, productId)
-            .then(() => {
-                this.loadOrders();
-            });
+        this.ordersService.removeOrderItem(orderId, productId).then(() => {
+            this.loadOrders();
+        });
     }
 }

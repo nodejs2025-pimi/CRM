@@ -4,8 +4,7 @@ import { HttpInterceptorFn } from "@angular/common/http";
 import { interceptor as interceptorFn } from "./interceptor";
 
 describe("interceptor", () => {
-    const interceptor: HttpInterceptorFn = (req, next) =>
-        TestBed.runInInjectionContext(() => interceptorFn(req, next));
+    const interceptor: HttpInterceptorFn = (req, next) => TestBed.runInInjectionContext(() => interceptorFn(req, next));
 
     beforeEach(() => {
         TestBed.configureTestingModule({});

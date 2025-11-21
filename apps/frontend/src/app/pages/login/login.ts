@@ -26,9 +26,8 @@ export class Login {
             password: this.password(),
         };
 
-        this.authService.login(user)
-            .then(() => {
-                this.router.navigate(["/"]);
-            });
+        this.authService.login(user).then(() => {
+            this.router.navigate(["/"]);
+        });
     }
 }

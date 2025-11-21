@@ -37,10 +37,7 @@ export class Analytics implements OnInit {
 
     protected readonly totalRevenue: Signal<number> = computed<number>(() => {
         return this.orders().reduce((sum: number, order: OrderType) => {
-            const orderTotal = order.orderProducts.reduce(
-                (acc: number, item: OrderItemType) => acc + item.price,
-                0,
-            );
+            const orderTotal = order.orderProducts.reduce((acc: number, item: OrderItemType) => acc + item.price, 0);
 
             return sum + orderTotal;
         }, 0);
@@ -197,11 +194,7 @@ export class Analytics implements OnInit {
     private readonly shopsService: ShopsService = inject(ShopsService);
 
     async ngOnInit(): Promise<void> {
-        await Promise.all([
-            this.loadOrders(),
-            this.loadProducts(),
-            this.loadShops(),
-        ]);
+        await Promise.all([this.loadOrders(), this.loadProducts(), this.loadShops()]);
 
         this.initOrdersChart();
         this.initShopsChart();

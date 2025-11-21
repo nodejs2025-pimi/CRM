@@ -1,9 +1,4 @@
-import {
-  Controller,
-  HttpCode,
-  Param,
-  ParseIntPipe,
-} from '@nestjs/common';
+import { Controller, HttpCode, Param, ParseIntPipe } from '@nestjs/common';
 import { Get, Post, Body, Delete, Patch } from '@nestjs/common';
 import {
   ApiOkResponse,

@@ -1,5 +1,18 @@
 import { NgClass } from "@angular/common";
-import { Component, effect, ElementRef, HostListener, input, InputSignal, model, ModelSignal, output, OutputEmitterRef, Signal, viewChild } from "@angular/core";
+import {
+    Component,
+    effect,
+    ElementRef,
+    HostListener,
+    input,
+    InputSignal,
+    model,
+    ModelSignal,
+    output,
+    OutputEmitterRef,
+    Signal,
+    viewChild,
+} from "@angular/core";
 import { Button } from "@shared/components/button/button";
 import { Title } from "@shared/components/title/title";
 
@@ -15,7 +28,8 @@ export class Popup {
 
     public closePopup: OutputEmitterRef<void> = output();
 
-    protected popupContent: Signal<ElementRef<HTMLDivElement>> = viewChild.required<ElementRef<HTMLDivElement>>("popupContent");
+    protected popupContent: Signal<ElementRef<HTMLDivElement>> =
+        viewChild.required<ElementRef<HTMLDivElement>>("popupContent");
 
     constructor() {
         effect(() => {
@@ -23,8 +37,7 @@ export class Popup {
 
             if (isPopupOpen) {
                 document.body.style.overflow = "hidden";
-            }
-            else {
+            } else {
                 document.body.style.overflow = "";
             }
         });

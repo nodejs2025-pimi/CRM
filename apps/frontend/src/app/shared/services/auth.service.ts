@@ -10,20 +10,25 @@ export class AuthService {
     private httpClient: HttpClient = inject(HttpClient);
 
     login(data: { username: string; password: string }): Promise<void> {
-        return firstValueFrom(this.httpClient.post<{ accessToken: string, refreshToken: string }>(environment.serverUrl + "/auth/login", data))
-            .then((response: { accessToken: string; refreshToken: string }) => {
-                localStorage.setItem("token", response.accessToken);
-                localStorage.setItem("refreshToken", response.refreshToken);
-            });
+        return firstValueFrom(
+            this.httpClient.post<{ accessToken: string; refreshToken: string }>(
+                environment.serverUrl + "/auth/login",
+                data,
+            ),
+        ).then((response: { accessToken: string; refreshToken: string }) => {
+            localStorage.setItem("token", response.accessToken);
+            localStorage.setItem("refreshToken", response.refreshToken);
+        });
     }
 
     refreshToken(refreshToken: string): Observable<string> {
-        return this.httpClient.post<{ accessToken: string }>(environment.serverUrl + "/auth/refresh", { token: refreshToken })
+        return this.httpClient
+            .post<{ accessToken: string }>(environment.serverUrl + "/auth/refresh", { token: refreshToken })
             .pipe(
                 map((response: { accessToken: string }) => {
                     localStorage.setItem("token", response.accessToken);
                     return response.accessToken;
-                })
+                }),
             );
     }
 }

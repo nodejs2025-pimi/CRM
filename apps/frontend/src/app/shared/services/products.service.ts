@@ -11,13 +11,15 @@ export class ProductsService {
     private httpClient: HttpClient = inject(HttpClient);
 
     public getProducts(sortBy: string, orderBy: string, searchValue: string): Promise<ProductType[]> {
-        return firstValueFrom(this.httpClient.get<ProductType[]>(environment.serverUrl + "/products", {
-            params: {
-                sort: sortBy,
-                order: orderBy,
-                search: searchValue
-            }
-        }));
+        return firstValueFrom(
+            this.httpClient.get<ProductType[]>(environment.serverUrl + "/products", {
+                params: {
+                    sort: sortBy,
+                    order: orderBy,
+                    search: searchValue,
+                },
+            }),
+        );
     }
 
     public getProductById(id: number): Promise<ProductType> {

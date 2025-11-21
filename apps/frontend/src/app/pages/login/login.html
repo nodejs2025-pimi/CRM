@@ -2,10 +2,28 @@
     <ui-title [title]="'Sign into your account'"></ui-title>
 
     <form class="login__form">
-        <ui-input [label]="'Username'" [(value)]="username" [type]="'text'" [placeholder]="'Enter your username'" [name]="'username'"></ui-input>
+        <ui-input
+            [label]="'Username'"
+            [(value)]="username"
+            [type]="'text'"
+            [placeholder]="'Enter your username'"
+            [name]="'username'"
+        ></ui-input>
 
-        <ui-input [label]="'Password'" [(value)]="password" [type]="'password'" [placeholder]="'Enter your password'" [name]="'password'"></ui-input>
+        <ui-input
+            [label]="'Password'"
+            [(value)]="password"
+            [type]="'password'"
+            [placeholder]="'Enter your password'"
+            [name]="'password'"
+        ></ui-input>
 
-        <ui-button class="login__button" [label]="'Login'" [type]="'primary'" [isFullWidth]="true" (click)="submit($event)"></ui-button>
+        <ui-button
+            class="login__button"
+            [label]="'Login'"
+            [type]="'primary'"
+            [isFullWidth]="true"
+            (click)="submit($event)"
+        ></ui-button>
     </form>
 </div>

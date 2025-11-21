@@ -1,10 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  Min,
-  IsInt,
-  IsEnum,
-  IsOptional,
-} from 'class-validator';
+import { Min, IsInt, IsEnum, IsOptional } from 'class-validator';
 import { OrderStatus } from '../enums/order-status.enum';
 
 export class CreateOrderDto {
