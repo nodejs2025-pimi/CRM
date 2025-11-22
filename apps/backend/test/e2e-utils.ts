@@ -9,6 +9,7 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 import { join } from 'path';
 import { Server } from 'http';
+import { Socket } from 'net';
 
 dotenv.config({ path: join(__dirname, '..', '.env') });
 
@@ -25,7 +26,7 @@ export async function bootstrapApp(): Promise<{
     process.env.DB_PASSWORD_TEST ?? process.env.DB_PASSWORD;
   process.env.DB_PORT = process.env.DB_PORT_TEST ?? process.env.DB_PORT;
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { logger: false });
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -70,6 +71,12 @@ export async function bootstrapApp(): Promise<{
 
   await app.listen(0);
   const server: Server = app.getHttpServer() as Server;
+  const sockets = new Set<Socket>();
+  server.on('connection', (socket) => {
+    sockets.add(socket);
+    socket.on('close', () => sockets.delete(socket));
+  });
+
   const addr = server.address();
   let port: number | string;
   if (addr && typeof addr !== 'string' && 'port' in addr) {
@@ -80,13 +87,21 @@ export async function bootstrapApp(): Promise<{
   const baseUrl = `http://127.0.0.1:${port}`;
 
   const close = async () => {
+    for (const socket of sockets) {
+      if (!socket.destroyed) {
+        socket.destroy();
+      }
+    }
+
+    server.closeAllConnections();
+
     try {
       await app.close();
     } catch {
       // ignore
     }
+
     try {
-      if (dataSource && !dataSource.isInitialized) return;
       if (dataSource && dataSource.isInitialized) await dataSource.destroy();
     } catch {
       // ignore
