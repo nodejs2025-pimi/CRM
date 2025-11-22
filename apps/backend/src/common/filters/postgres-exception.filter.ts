@@ -17,7 +17,7 @@ export class PostgresExceptionFilter implements ExceptionFilter {
     const res: Response = host.switchToHttp().getResponse();
 
     let httpException: HttpException;
-    const code = exception.driverError?.code;
+    const code = (exception.driverError as { code: string } | undefined)?.code;
 
     switch (code) {
       case UNIQUE_ERR_CODE:

@@ -186,7 +186,7 @@ export class OrderService {
   }
 
   private calculateOrderProductPrice(product: Product, quantity: number) {
-    let price;
+    let price: number;
 
     if (quantity >= product.wholesale_minimum_quantity) {
       price = product.wholesale_price * quantity;

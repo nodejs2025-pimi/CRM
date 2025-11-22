@@ -26,7 +26,18 @@ export class ProductService {
 
     const normCsv = (v: unknown) => {
       if (v === null || v === undefined) return '';
-      let s = String(v);
+      let s: string;
+      if (typeof v === 'object') {
+        try {
+          s = JSON.stringify(v);
+        } catch {
+          // eslint-disable-next-line @typescript-eslint/no-base-to-string
+          s = String(v);
+        }
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        s = String(v);
+      }
 
       if (/^[=+\-@;]/.test(s)) s = `'${s}`;
 

@@ -9,9 +9,11 @@ import { OrderProduct } from '../order/entities/order-product.entity';
 import { Order } from '../order/entities/order.entity';
 import { Establishment } from '../establishment/entities/establishment.entity';
 import 'dotenv/config';
+import { Application } from 'express';
 
 describe('ProductModule (integration)', () => {
   let app: INestApplication;
+  let appHttpServer: Application;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -40,6 +42,8 @@ describe('ProductModule (integration)', () => {
     );
     app.useGlobalFilters(new PostgresExceptionFilter());
     await app.init();
+
+    appHttpServer = app.getHttpServer() as unknown as Application;
   });
 
   afterAll(async () => {
@@ -48,7 +52,7 @@ describe('ProductModule (integration)', () => {
 
   // GET (csv)
   it('GET /products/csv [Check csv export]', async () => {
-    await request(app.getHttpServer()).post('/products').send({
+    await request(appHttpServer).post('/products').send({
       name: 'CSV Product',
       price: 100,
       available_quantity: 50,
@@ -56,9 +60,7 @@ describe('ProductModule (integration)', () => {
       wholesale_minimum_quantity: 10,
     });
 
-    const res = await request(app.getHttpServer())
-      .get('/products/csv')
-      .expect(200);
+    const res = await request(appHttpServer).get('/products/csv').expect(200);
 
     expect(res.header['content-type']).toContain('text/csv');
     const rows = res.text.split('\n');
@@ -78,14 +80,19 @@ describe('ProductModule (integration)', () => {
       wholesale_price: null,
       wholesale_minimum_quantity: '100',
     };
-    const res = await request(app.getHttpServer())
+    const res = await request(app.getHttpServer() as unknown as Application)
       .post('/products')
       .send(product)
       .expect(400);
 
-    expect(res.body.error).toBeDefined();
+    const responseBody: { error: string; message: string[] } = res.body as {
+      error: string;
+      message: string[];
+    };
 
-    expect(Array.isArray(res.body.message)).toBe(true);
+    expect(responseBody.error).toBeDefined();
+
+    expect(Array.isArray(responseBody.message)).toBe(true);
 
     const expectedMessages = [
       'name must be a string',
@@ -96,7 +103,7 @@ describe('ProductModule (integration)', () => {
     ];
 
     for (const msg of expectedMessages) {
-      expect(res.body.message).toContain(msg);
+      expect(responseBody.message).toContain(msg);
     }
   });
 
@@ -108,19 +115,32 @@ describe('ProductModule (integration)', () => {
       wholesale_price: 50.25,
       wholesale_minimum_quantity: 20,
     };
-    const firstRes = await request(app.getHttpServer())
+    const firstRes = await request(appHttpServer)
       .post('/products')
       .send(product)
       .expect(201);
 
-    expect(firstRes.body.name).toBe(product.name);
+    const firstResBody: { product_id: number; name: string } =
+      firstRes.body as {
+        product_id: number;
+        name: string;
+      };
 
-    const secondRes = await request(app.getHttpServer())
+    expect(firstResBody.name).toBe(product.name);
+
+    const secondRes = await request(appHttpServer)
       .post('/products')
       .send(product)
       .expect(409);
-    expect(secondRes.body.error).toBeDefined();
-    expect(secondRes.body.message).toBe('Duplicate error.');
+
+    const secondResBody: { error: string; message: string } =
+      secondRes.body as {
+        error: string;
+        message: string;
+      };
+
+    expect(secondResBody.error).toBeDefined();
+    expect(secondResBody.message).toBe('Duplicate error.');
   });
 
   it('POST /products [Check creation]', async () => {
@@ -131,29 +151,52 @@ describe('ProductModule (integration)', () => {
       wholesale_price: 50.25,
       wholesale_minimum_quantity: 20,
     };
-    const res = await request(app.getHttpServer())
+    const res = await request(appHttpServer)
       .post('/products')
       .send(product)
       .expect(201);
 
-    expect(res.body.product_id).toBeDefined();
-    expect(res.body.name).toBe(product.name);
-    expect(res.body.price).toBe(product.price);
-    expect(res.body.available_quantity).toBe(product.available_quantity);
-    expect(res.body.wholesale_price).toBe(product.wholesale_price);
-    expect(res.body.wholesale_minimum_quantity).toBe(
+    const responseBody: {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    } = res.body as {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    };
+
+    expect(responseBody.product_id).toBeDefined();
+    expect(responseBody.name).toBe(product.name);
+    expect(responseBody.price).toBe(product.price);
+    expect(responseBody.available_quantity).toBe(product.available_quantity);
+    expect(responseBody.wholesale_price).toBe(product.wholesale_price);
+    expect(responseBody.wholesale_minimum_quantity).toBe(
       product.wholesale_minimum_quantity,
     );
-    expect(res.body.is_active).toBe(true);
+    expect(responseBody.is_active).toBe(true);
   });
 
   // GET
   it('GET /products/:id [Check getting non-existing product]', async () => {
-    const res = await request(app.getHttpServer())
+    const res = await request(appHttpServer)
       .get('/products/999999') // або якийсь інший гарантовано неіснуючий id
       .expect(404);
 
-    expect(res.body.error).toBeDefined();
+    const responseBody: { error: string; message: string } = res.body as {
+      error: string;
+      message: string;
+    };
+
+    expect(responseBody.error).toBeDefined();
   });
 
   it('GET /products/:id [Check getting existing product]', async () => {
@@ -164,50 +207,73 @@ describe('ProductModule (integration)', () => {
       wholesale_price: 50.25,
       wholesale_minimum_quantity: 20,
     };
-    const createRes = await request(app.getHttpServer())
+    const createRes = await request(appHttpServer)
       .post('/products')
       .send(product)
       .expect(201);
 
-    const id = createRes.body.product_id;
+    const id = (createRes.body as { product_id: number }).product_id;
 
-    const getRes = await request(app.getHttpServer())
+    const getRes = await request(appHttpServer)
       .get(`/products/${id}`)
       .expect(200);
 
-    expect(getRes.body.product_id).toBe(id);
-    expect(getRes.body.name).toBe(product.name);
-    expect(getRes.body.price).toBe(product.price);
-    expect(getRes.body.available_quantity).toBe(product.available_quantity);
-    expect(getRes.body.wholesale_price).toBe(product.wholesale_price);
-    expect(getRes.body.wholesale_minimum_quantity).toBe(
+    const getResBody: {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    } = getRes.body as {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    };
+
+    expect(getResBody.product_id).toBe(id);
+    expect(getResBody.name).toBe(product.name);
+    expect(getResBody.price).toBe(product.price);
+    expect(getResBody.available_quantity).toBe(product.available_quantity);
+    expect(getResBody.wholesale_price).toBe(product.wholesale_price);
+    expect(getResBody.wholesale_minimum_quantity).toBe(
       product.wholesale_minimum_quantity,
     );
-    expect(getRes.body.is_active).toBe(true);
+    expect(getResBody.is_active).toBe(true);
   });
 
   it('GET /products [Check validation of query params]', async () => {
-    const res = await request(app.getHttpServer())
+    const res = await request(appHttpServer)
       .get('/products')
       .query({ sort: 'invalid' })
       .expect(400);
 
-    expect(res.body.error).toBeDefined();
-    expect(Array.isArray(res.body.message)).toBe(true);
-    expect(res.body.message).toContain(
+    const responseBody: { error: string; message: string[] } = res.body as {
+      error: string;
+      message: string[];
+    };
+
+    expect(responseBody.error).toBeDefined();
+    expect(Array.isArray(responseBody.message)).toBe(true);
+    expect(responseBody.message).toContain(
       'sort must be one of the following values: name, price, available_quantity',
     );
   });
 
   it('GET /products [Check list with default sorting]', async () => {
-    await request(app.getHttpServer()).post('/products').send({
+    await request(appHttpServer).post('/products').send({
       name: 'List Product B',
       price: 10,
       available_quantity: 20,
       wholesale_price: 5,
       wholesale_minimum_quantity: 10,
     });
-    await request(app.getHttpServer()).post('/products').send({
+    await request(appHttpServer).post('/products').send({
       name: 'List Product A',
       price: 20,
       available_quantity: 40,
@@ -215,26 +281,28 @@ describe('ProductModule (integration)', () => {
       wholesale_minimum_quantity: 30,
     });
 
-    const res = await request(app.getHttpServer())
+    const res = await request(appHttpServer)
       .get('/products')
       .query({ search: 'List Product' })
       .expect(200);
 
+    const responseBody: { name: string }[] = res.body as { name: string }[];
+
     expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBe(2);
-    expect(res.body[0].name).toBe('List Product A');
-    expect(res.body[1].name).toBe('List Product B');
+    expect(responseBody.length).toBe(2);
+    expect(responseBody[0].name).toBe('List Product A');
+    expect(responseBody[1].name).toBe('List Product B');
   });
 
   it('GET /products [Check sort by price desc]', async () => {
-    await request(app.getHttpServer()).post('/products').send({
+    await request(appHttpServer).post('/products').send({
       name: 'Sort Product Low',
       price: 10,
       available_quantity: 10,
       wholesale_price: 4,
       wholesale_minimum_quantity: 5,
     });
-    await request(app.getHttpServer()).post('/products').send({
+    await request(appHttpServer).post('/products').send({
       name: 'Sort Product High',
       price: 50,
       available_quantity: 10,
@@ -242,28 +310,30 @@ describe('ProductModule (integration)', () => {
       wholesale_minimum_quantity: 5,
     });
 
-    const res = await request(app.getHttpServer())
+    const res = await request(appHttpServer)
       .get('/products')
       .query({ search: 'Sort Product', sort: 'price', order: 'desc' })
       .expect(200);
 
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBe(2);
-    expect(res.body[0].price).toBeGreaterThan(res.body[1].price);
+    const responseBody: { price: number }[] = res.body as { price: number }[];
+
+    expect(Array.isArray(responseBody)).toBe(true);
+    expect(responseBody.length).toBe(2);
+    expect(responseBody[0].price).toBeGreaterThan(responseBody[1].price);
   });
 
   // PATCH
   it('PATCH /products/:id [Check validation]', async () => {
-    const createRes = await request(app.getHttpServer())
-      .post('/products')
-      .send({
-        name: 'Patch Product Validation',
-        price: 100,
-        available_quantity: 50,
-        wholesale_price: 40,
-        wholesale_minimum_quantity: 10,
-      });
-    const id = createRes.body.product_id;
+    const createRes = await request(appHttpServer).post('/products').send({
+      name: 'Patch Product Validation',
+      price: 100,
+      available_quantity: 50,
+      wholesale_price: 40,
+      wholesale_minimum_quantity: 10,
+    });
+
+    const id = (createRes.body as { product_id: number }).product_id;
+
     const updatedProduct = {
       price: '120',
       available_quantity: true,
@@ -271,12 +341,18 @@ describe('ProductModule (integration)', () => {
       wholesale_minimum_quantity: 1.05,
       is_active: 'false',
     };
-    const updateRes = await request(app.getHttpServer())
+    const updateRes = await request(appHttpServer)
       .patch(`/products/${id}`)
       .send(updatedProduct)
       .expect(400);
 
-    expect(updateRes.body.error).toBeDefined();
+    const responseBody: { error: string; message: string[] } =
+      updateRes.body as {
+        error: string;
+        message: string[];
+      };
+
+    expect(responseBody.error).toBeDefined();
     const expectedMessages = [
       'available_quantity must not be less than 0',
       'available_quantity must be an integer number',
@@ -288,44 +364,50 @@ describe('ProductModule (integration)', () => {
     ];
 
     for (const msg of expectedMessages) {
-      expect(updateRes.body.message).toContain(msg);
+      expect(responseBody.message).toContain(msg);
     }
   });
 
   it('PATCH /products/:id [Check filter]', async () => {
-    const product1 = await request(app.getHttpServer()).post('/products').send({
+    const product1 = await request(appHttpServer).post('/products').send({
       name: 'Patch Product Ckeck Filter 1',
       price: 100,
       available_quantity: 50,
       wholesale_price: 40,
       wholesale_minimum_quantity: 10,
     });
-    const product2 = await request(app.getHttpServer()).post('/products').send({
+
+    const product2 = await request(appHttpServer).post('/products').send({
       name: 'Patch Product Check Filter 2',
       price: 100,
       available_quantity: 50,
       wholesale_price: 40,
       wholesale_minimum_quantity: 10,
     });
-    const updateRes = await request(app.getHttpServer())
-      .patch(`/products/${product2.body.product_id}`)
-      .send({ name: product1.body.name })
+
+    const product1Body: { product_id: number; name: string } =
+      product1.body as { product_id: number; name: string };
+
+    const product2Body: { product_id: number; name: string } =
+      product2.body as { product_id: number; name: string };
+
+    const updateRes = await request(appHttpServer)
+      .patch(`/products/${product2Body.product_id}`)
+      .send({ name: product1Body.name })
       .expect(409);
 
-    expect(updateRes.body.error).toBeDefined();
+    expect((updateRes.body as { error: string }).error).toBeDefined();
   });
 
   it('PATCH /products/:id [Check update]', async () => {
-    const createRes = await request(app.getHttpServer())
-      .post('/products')
-      .send({
-        name: 'Patch Product',
-        price: 100,
-        available_quantity: 50,
-        wholesale_price: 40,
-        wholesale_minimum_quantity: 10,
-      });
-    const id = createRes.body.product_id;
+    const createRes = await request(appHttpServer).post('/products').send({
+      name: 'Patch Product',
+      price: 100,
+      available_quantity: 50,
+      wholesale_price: 40,
+      wholesale_minimum_quantity: 10,
+    });
+    const id = (createRes.body as { product_id: number }).product_id;
     const updatedProduct = {
       price: 120,
       available_quantity: 80,
@@ -333,45 +415,57 @@ describe('ProductModule (integration)', () => {
       wholesale_minimum_quantity: 15,
       is_active: false,
     };
-    const updateRes = await request(app.getHttpServer())
+    const updateRes = await request(appHttpServer)
       .patch(`/products/${id}`)
       .send(updatedProduct)
       .expect(200);
 
-    expect(updateRes.body.product_id).toBe(id);
-    expect(updateRes.body.name).toBe('Patch Product');
-    expect(updateRes.body.price).toBe(updatedProduct.price);
-    expect(updateRes.body.available_quantity).toBe(
+    const updateResBody: {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    } = updateRes.body as {
+      product_id: number;
+      name: string;
+      price: number;
+      available_quantity: number;
+      wholesale_price: number;
+      wholesale_minimum_quantity: number;
+      is_active: boolean;
+    };
+
+    expect(updateResBody.product_id).toBe(id);
+    expect(updateResBody.name).toBe('Patch Product');
+    expect(updateResBody.price).toBe(updatedProduct.price);
+    expect(updateResBody.available_quantity).toBe(
       updatedProduct.available_quantity,
     );
-    expect(updateRes.body.wholesale_price).toBe(updatedProduct.wholesale_price);
-    expect(updateRes.body.wholesale_minimum_quantity).toBe(
+    expect(updateResBody.wholesale_price).toBe(updatedProduct.wholesale_price);
+    expect(updateResBody.wholesale_minimum_quantity).toBe(
       updatedProduct.wholesale_minimum_quantity,
     );
-    expect(updateRes.body.is_active).toBe(false);
+    expect(updateResBody.is_active).toBe(false);
   });
 
   // DELETE
   it('DELETE /products/:id [Check non-existing deletion]', async () => {
-    const res = await request(app.getHttpServer())
-      .delete(`/products/9999`)
-      .expect(404);
+    await request(appHttpServer).delete(`/products/9999`).expect(404);
   });
 
   it('DELETE /products/:id [Check deletion]', async () => {
-    const createRes = await request(app.getHttpServer())
-      .post('/products')
-      .send({
-        name: 'ToDelete Product',
-        price: 100,
-        available_quantity: 50,
-        wholesale_price: 40,
-        wholesale_minimum_quantity: 10,
-      });
-    const id = createRes.body.product_id;
+    const createRes = await request(appHttpServer).post('/products').send({
+      name: 'ToDelete Product',
+      price: 100,
+      available_quantity: 50,
+      wholesale_price: 40,
+      wholesale_minimum_quantity: 10,
+    });
+    const id = (createRes.body as { product_id: number }).product_id;
 
-    const deleteRes = await request(app.getHttpServer())
-      .delete(`/products/${id}`)
-      .expect(204);
+    await request(appHttpServer).delete(`/products/${id}`).expect(204);
   });
 });

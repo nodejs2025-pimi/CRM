@@ -1,8 +1,8 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { OrderService } from './order.service';
+// import { Test, TestingModule } from '@nestjs/testing';
+// import { OrderService } from './order.service';
 
 describe('OrderService', () => {
-  let service: OrderService;
+  // let service: OrderService;
 
   // beforeEach(async () => {
   //   const module: TestingModule = await Test.createTestingModule({
