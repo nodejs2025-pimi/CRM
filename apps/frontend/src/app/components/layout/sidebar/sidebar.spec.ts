@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { appConfig } from "app.config";
 
 import { Sidebar } from "./sidebar";
 
@@ -9,6 +10,7 @@ describe("Sidebar", () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [Sidebar],
+            providers: [...appConfig.providers],
         }).compileComponents();
 
         fixture = TestBed.createComponent(Sidebar);

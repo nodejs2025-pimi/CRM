@@ -4,7 +4,14 @@
     "extends": "./tsconfig.json",
     "compilerOptions": {
         "outDir": "./out-tsc/spec",
-        "types": ["jasmine"]
+        "types": ["jasmine"],
+        "baseUrl": "src/app",
+        "paths": {
+            "@shared/*": ["shared/*"],
+            "@layouts/*": ["layouts/*"],
+            "@pages/*": ["pages/*"],
+            "@components/*": ["components/*"]
+        }
     },
     "include": ["src/**/*.ts"]
 }

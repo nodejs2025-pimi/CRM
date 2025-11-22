@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { appConfig } from "app.config";
 
 import { Popup } from "./popup";
 
@@ -9,6 +10,7 @@ describe("Popup", () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [Popup],
+            providers: [...appConfig.providers],
         }).compileComponents();
 
         fixture = TestBed.createComponent(Popup);

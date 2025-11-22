@@ -16,6 +16,7 @@
         "start:back": "npm --workspace=apps/backend run start",
         "start:back:dev": "npm --workspace=apps/backend run start:dev",
         "start:front:dev": "npm --workspace=apps/frontend run start:dev",
+        "test:front": "npm --workspace=apps/frontend run test",
         "test:back": "npm run test:back:unit & npm run test:back:e2e",
         "test:back:unit": "npm --workspace=apps/backend run test",
         "test:back:e2e": "npm --workspace=apps/backend run test:e2e",
