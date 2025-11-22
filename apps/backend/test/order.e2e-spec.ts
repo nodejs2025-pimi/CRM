@@ -50,8 +50,6 @@ describe('Order E2E', () => {
       .set('Authorization', `Bearer ${token}`)
       .expect(200);
 
-    console.log('Create Order Body:', order.body);
-
     type GetOrderBodyType = {
       order_id: string;
       status: string;
