@@ -70,11 +70,27 @@ describe('ProductService', () => {
 
   describe('exportCsv', () => {
     it('should return correct CSV string', async () => {
+      const circularObj = { name: 'Circular' };
+      circularObj['self'] = circularObj;
+      const dangerousProducts = [
+        {
+          ...products[0],
+          price: { currency: 'USD', amount: 100 },
+          name: 'Safe=Value',
+        },
+        {
+          ...products[1],
+          available_quantity: undefined,
+          wholesale_price: null,
+          wholesale_minimum_quantity: circularObj,
+          price: `@200`,
+        },
+      ];
       const expectedCsv =
         `product_id,name,available_quantity,price,wholesale_price,wholesale_minimum_quantity,is_active\n` +
-        `1,Product 1,10,100,90,5,yes\n` +
-        `2,"Product 2 with special "", chars",20,200,180,10,no`;
-      mockProductRepository.find.mockResolvedValue(products);
+        `1,Safe=Value,10,"{""currency"":""USD"",""amount"":100}",90,5,yes\n` +
+        `2,"Product 2 with special "", chars",,'@200,,[object Object],no`;
+      mockProductRepository.find.mockResolvedValue(dangerousProducts);
 
       const result = await service.exportCsv();
 
@@ -88,7 +104,7 @@ describe('ProductService', () => {
       const dto: GetProductsDto = {
         sort: 'price',
         order: 'desc',
-        search: 'product',
+        search: ' product',
       };
       const expectedProducts = products
         .filter((p) => p.name.toLowerCase().includes('product'))
@@ -139,7 +155,15 @@ describe('ProductService', () => {
     it('should throw NotFoundException if product not found', async () => {
       mockProductRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.getById(999)).rejects.toThrow(NotFoundException);
+      let thrownError: NotFoundException | undefined;
+      try {
+        await service.getById(999);
+      } catch (error) {
+        thrownError = error as NotFoundException;
+      }
+
+      expect(thrownError).toBeInstanceOf(NotFoundException);
+      expect(thrownError?.message).toEqual(`Product not found.`);
     });
   });
 
@@ -196,7 +220,15 @@ describe('ProductService', () => {
     it('should throw NotFoundException if product to update not found', async () => {
       mockProductRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.update(id, {})).rejects.toThrow(NotFoundException);
+      let thrownError: NotFoundException | undefined;
+      try {
+        await service.update(id, {});
+      } catch (error) {
+        thrownError = error as NotFoundException;
+      }
+
+      expect(thrownError).toBeInstanceOf(NotFoundException);
+      expect(thrownError?.message).toEqual(`Product not found.`);
     });
   });
 
@@ -219,7 +251,15 @@ describe('ProductService', () => {
     it('should throw NotFoundException if product to remove not found', async () => {
       mockProductRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove(id)).rejects.toThrow(NotFoundException);
+      let thrownError: NotFoundException | undefined;
+      try {
+        await service.remove(id);
+      } catch (error) {
+        thrownError = error as NotFoundException;
+      }
+
+      expect(thrownError).toBeInstanceOf(NotFoundException);
+      expect(thrownError?.message).toEqual(`Product not found.`);
     });
   });
 });
