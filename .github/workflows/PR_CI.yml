@@ -13,7 +13,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check commit messages
-        uses: tim-actions/commit_message-checker-with-regex@v1
+        uses: tim-actions/commit-message-checker-with-regex@v1
         with:
           regex: '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\([\w\s\-]+\))?: .{1,50}'
           error_message: 'Commit messages must follow the Conventional Commits format. Example: "feat(module): add new feature"'
