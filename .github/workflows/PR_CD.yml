@@ -39,7 +39,14 @@ jobs:
 
             sudo apt install git -y
             cd /home/${{ secrets.SERVER_USER }}
-            git clone https://github.com/nodejs2025-pimi/CRM || cd CRM && git pull origin main
+            git clone ${{ github.repositoryUrl }} || cd CRM && git pull origin main
             cd CRM
+
+            cp .env.test .env
+            sed -i "s/SERVER_IP=.*/SERVER_IP=${{ secrets.SERVER_HOST }}/" .env
+            sed -i "s/ADMIN_PASSWORD=.*/ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}/" .env
+            sed -i "s/JWT_ACCESS_SECRET=.*/JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}'/" .env
+            sed -i "s/JWT_REFRESH_SECRET=.*/JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}'/" .env
+
             sudo docker compose -f docker-compose.prod.yml down
             sudo docker compose -f docker-compose.prod.yml up -d --build

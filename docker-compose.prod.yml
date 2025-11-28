@@ -15,8 +15,8 @@ services:
     build:
       context: .
       dockerfile: ./apps/frontend/Dockerfile.prod
-    env_file:
-      - .env
+      args:
+        SERVER_IP: ${SERVER_IP}
     ports:
       - "80:80"
     depends_on:
