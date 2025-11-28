@@ -15,7 +15,7 @@ jobs:
       - name: Check commit messages
         uses: gsactions/commit-message-checker@v2
         with:
-          pattern: '^(feat|fix|docs|style|refactor|perf|test|chore)(\([\w\s]+\))?: .{1,50}'
+          pattern: '^(feat|fix|docs|style|refactor|perf|test|chore|ci|cd)(\([\w\s]+\))?: .{1,50}'
           error: 'Commit message does not follow the conventional format.'
 
   check_code_quality:
