@@ -2,8 +2,12 @@ FROM node:24-alpine
 
 WORKDIR /CRM
 
-COPY ./ ./ 
+COPY ./package*.json ./
+COPY ./apps/backend/package*.json ./apps/backend/
+COPY ./apps/frontend/package*.json ./apps/frontend/
 
 RUN npm install --only=dev
+
+COPY ./ ./ 
 
 CMD ["npm", "run", "test"]
