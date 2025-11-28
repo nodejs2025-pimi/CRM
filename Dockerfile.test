@@ -1,0 +1,9 @@
+FROM node:24-alpine
+
+WORKDIR /CRM
+
+COPY ./ ./ 
+
+RUN npm install --only=dev
+
+CMD ["npm", "run", "test"]

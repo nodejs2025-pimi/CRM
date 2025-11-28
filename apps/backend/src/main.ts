@@ -17,7 +17,11 @@ async function bootstrap() {
   app.useGlobalFilters(new PostgresExceptionFilter());
 
   app.enableCors({
-    origin: ['http://127.0.0.1:4200', 'http://localhost:4200'],
+    origin: [
+      'http://127.0.0.1:4200',
+      'http://localhost:4200',
+      `http://${process.env.SERVER_IP}`,
+    ],
     methods: 'GET,PUT,PATCH,POST,DELETE',
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization',
