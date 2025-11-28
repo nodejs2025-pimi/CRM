@@ -42,7 +42,7 @@ jobs:
             git clone ${{ github.repositoryUrl }} || cd CRM && git pull origin main
             cd CRM
 
-            cp .env.test .env
+            cp .env.example .env
             sed -i "s/SERVER_IP=.*/SERVER_IP=${{ secrets.SERVER_HOST }}/" .env
             sed -i "s/ADMIN_PASSWORD=.*/ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}/" .env
             sed -i "s/JWT_ACCESS_SECRET=.*/JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}'/" .env
