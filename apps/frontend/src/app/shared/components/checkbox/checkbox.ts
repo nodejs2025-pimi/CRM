@@ -4,7 +4,7 @@ import { Component, input, InputSignal, model, ModelSignal, output, OutputEmitte
     selector: "ui-checkbox",
     imports: [],
     templateUrl: "./checkbox.html",
-    styleUrl: "./checkbox.css"
+    styleUrl: "./checkbox.css",
 })
 export class Checkbox {
     public readonly value: ModelSignal<boolean | undefined> = model<boolean | undefined>(false);

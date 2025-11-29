@@ -2,10 +2,10 @@ import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { ShopType } from "@shared/types/ShopType";
 import { firstValueFrom } from "rxjs";
-import {environment} from "@shared/environments/environment";
+import { environment } from "@shared/environments/environment";
 
 @Injectable({
-    providedIn: "root"
+    providedIn: "root",
 })
 export class ShopsService {
     private httpClient: HttpClient = inject(HttpClient);

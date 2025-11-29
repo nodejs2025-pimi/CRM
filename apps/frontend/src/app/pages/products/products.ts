@@ -53,7 +53,8 @@ export class Products implements OnInit {
     }
 
     private loadProducts(): void {
-        this.productsService.getProducts(this.orderByField(), this.orderDirection(), this.searchValue())
+        this.productsService
+            .getProducts(this.orderByField(), this.orderDirection(), this.searchValue())
             .then((fetchedProducts: ProductType[]) => {
                 this.products.set(fetchedProducts);
             });
@@ -62,8 +63,7 @@ export class Products implements OnInit {
     protected orderBy(field: "name" | "price" | "available_quantity"): void {
         if (this.orderByField() === field) {
             this.orderDirection.set(this.orderDirection() === "asc" ? "desc" : "asc");
-        }
-        else {
+        } else {
             this.orderByField.set(field);
             this.orderDirection.set("asc");
         }
@@ -93,15 +93,16 @@ export class Products implements OnInit {
             is_active: this.productIsActive(),
         };
 
-        this.productsService.createProduct(newProduct)
-            .then(() => {
-                this.loadProducts();
-                this.isProductCreationPopupOpen.set(false);
-            });
+        this.productsService.createProduct(newProduct).then(() => {
+            this.loadProducts();
+            this.isProductCreationPopupOpen.set(false);
+        });
     }
 
     protected editProduct(id: number): void {
-        const productToEdit: ProductType | undefined = this.products().find((product: ProductType) => product.product_id === id);
+        const productToEdit: ProductType | undefined = this.products().find(
+            (product: ProductType) => product.product_id === id,
+        );
 
         if (!productToEdit) {
             return;
@@ -132,12 +133,11 @@ export class Products implements OnInit {
             is_active: this.productIsActive(),
         };
 
-        this.productsService.updateProduct(this.editingProductId()!, updatedProductData)
-            .then(() => {
-                this.loadProducts();
+        this.productsService.updateProduct(this.editingProductId()!, updatedProductData).then(() => {
+            this.loadProducts();
 
-                this.isProductEditingPopupOpen.set(false);
-            });
+            this.isProductEditingPopupOpen.set(false);
+        });
     }
 
     protected onPopupClose(): void {
@@ -146,9 +146,8 @@ export class Products implements OnInit {
     }
 
     protected deleteProduct(id: number): void {
-        this.productsService.deleteProduct(id)
-            .then(() => {
-                this.loadProducts();
-            });
+        this.productsService.deleteProduct(id).then(() => {
+            this.loadProducts();
+        });
     }
 }

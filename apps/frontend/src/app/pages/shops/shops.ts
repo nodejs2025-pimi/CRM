@@ -38,10 +38,9 @@ export class Shops implements OnInit {
     }
 
     private loadShops(): void {
-        this.shopsService.getShops()
-            .then((fetchedShops: ShopType[]) => {
-                this.shops.set(fetchedShops);
-            });
+        this.shopsService.getShops().then((fetchedShops: ShopType[]) => {
+            this.shops.set(fetchedShops);
+        });
     }
 
     protected openShopCreationPopup(): void {
@@ -66,11 +65,10 @@ export class Shops implements OnInit {
             address: this.shopAddress(),
         };
 
-        this.shopsService.createShop(newShop)
-            .then(() => {
-                this.loadShops();
-                this.isShopCreationPopupOpen.set(false);
-            });
+        this.shopsService.createShop(newShop).then(() => {
+            this.loadShops();
+            this.isShopCreationPopupOpen.set(false);
+        });
     }
 
     protected editShop(id: number): void {
@@ -103,11 +101,10 @@ export class Shops implements OnInit {
             address: this.shopAddress(),
         };
 
-        this.shopsService.updateShop(this.editingShopId()!, updatedShopData)
-            .then(() => {
-                this.loadShops();
-                this.isShopEditingPopupOpen.set(false);
-            });
+        this.shopsService.updateShop(this.editingShopId()!, updatedShopData).then(() => {
+            this.loadShops();
+            this.isShopEditingPopupOpen.set(false);
+        });
     }
 
     protected onPopupClose(): void {
@@ -116,9 +113,8 @@ export class Shops implements OnInit {
     }
 
     protected deleteShop(id: number): void {
-        this.shopsService.deleteShop(id)
-            .then(() => {
-                this.loadShops();
-            });
+        this.shopsService.deleteShop(id).then(() => {
+            this.loadShops();
+        });
     }
 }

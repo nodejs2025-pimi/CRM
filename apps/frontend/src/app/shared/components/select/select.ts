@@ -5,7 +5,7 @@ import { Component, input, InputSignal, model, ModelSignal } from "@angular/core
     selector: "ui-select",
     imports: [CommonModule],
     templateUrl: "./select.html",
-    styleUrl: "./select.css"
+    styleUrl: "./select.css",
 })
 export class Select {
     public readonly label: InputSignal<string> = input<string>("");

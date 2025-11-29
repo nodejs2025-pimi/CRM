@@ -2,7 +2,12 @@
     <div class="analytics__header">
         <ui-title [title]="'Analytics'"></ui-title>
 
-        <ui-button [label]="'Download analytics'" [icon]="'fa-regular fa-circle-down'" [type]="'primary'" (click)="downloadPDF()"></ui-button>
+        <ui-button
+            [label]="'Download analytics'"
+            [icon]="'fa-regular fa-circle-down'"
+            [type]="'primary'"
+            (click)="downloadPDF()"
+        ></ui-button>
     </div>
 
     <div class="analytics__main" #analytics>
@@ -72,12 +77,12 @@
         <div class="main__charts">
             <div class="charts__chart-wrapper chart">
                 <span class="chart__title">Revenue by month</span>
-                <canvas class="chart__canvas" #revenueByMonth ></canvas>
+                <canvas class="chart__canvas" #revenueByMonth></canvas>
             </div>
-            
+
             <div class="charts__chart-wrapper chart">
                 <span class="chart__title">Establishment count</span>
-                <canvas class="chart__canvas" #establishmentCount ></canvas>
+                <canvas class="chart__canvas" #establishmentCount></canvas>
             </div>
         </div>
     </div>
