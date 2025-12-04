@@ -8,7 +8,9 @@
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "lint": "eslint \"src/**/*.{ts,html}\" --fix",
-        "stylelint": "stylelint \"src/**/*.{css}\" --fix"
+        "stylelint": "stylelint \"src/**/*.{css}\" --fix",
+        "check-lint": "eslint \"src/**/*.{ts,html}\"",
+        "check-stylelint": "stylelint \"src/**/*.{css}\""
     },
     "private": true,
     "dependencies": {
