@@ -1,0 +1,21 @@
+FROM node:24-alpine
+
+WORKDIR /CRM
+
+COPY ./package*.json ./
+COPY ./apps/frontend/package*.json ./apps/frontend/
+
+ENV npm_config_ignore_scripts=true
+RUN npm install
+
+COPY ./apps/frontend ./apps/frontend
+
+RUN npm run build:front
+
+FROM nginx:1.29.3-alpine
+
+COPY --from=0 /CRM/apps/frontend/dist/frontend/browser /usr/share/nginx/html
+
+COPY ./apps/frontend/nginx.conf /etc/nginx/conf.d/default.conf
+
+CMD ["nginx", "-g", "daemon off;"]

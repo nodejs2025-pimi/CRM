@@ -1,0 +1,28 @@
+FROM node:24-alpine
+
+WORKDIR /CRM
+
+COPY ./package*.json ./
+COPY ./apps/backend/package*.json ./apps/backend/
+
+RUN npm install 
+
+COPY ./apps/backend ./apps/backend
+
+RUN npm run build:back
+
+CMD ["node", "apps/backend/dist/main.js"]
+
+FROM node:24-alpine
+
+WORKDIR /CRM
+
+COPY ./package*.json ./
+COPY ./apps/backend/package*.json ./apps/backend/
+
+ENV npm_config_ignore_scripts=true
+RUN npm install --only=production
+
+COPY --from=0 /CRM/apps/backend/dist ./apps/backend/dist
+
+CMD ["node", "apps/backend/dist/main.js"]
