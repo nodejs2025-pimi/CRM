@@ -13,10 +13,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Check commit messages
-        uses: tim-actions/commit-message-checker@v1.5.0
+        uses: gsactions/commit-message-checker@v2
         with:
-          pattern: '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)(\([\w\s\-]+\))?: .{1,50}'
-          error: 'Commit messages must follow the Conventional Commits format'
+          pattern: '^(feat|fix|docs|style|refactor|perf|test|chore)(\([\w\s]+\))?: .{1,50}'
+          error: 'Commit message does not follow the conventional format.'
 
   check_code_quality:
     runs-on: ubuntu-latest
