@@ -30,7 +30,7 @@ export class CreateProductDto {
   available_quantity?: number;
 
   @ApiProperty({
-    description: 'Два знаки після коми',
+    description: 'Two decimal places',
     minimum: 0,
     example: 200.99,
   })
@@ -39,7 +39,7 @@ export class CreateProductDto {
   price: number;
 
   @ApiProperty({
-    description: 'Два знаки після коми',
+    description: 'Two decimal places',
     minimum: 0,
     example: 200.99,
   })
@@ -49,15 +49,15 @@ export class CreateProductDto {
 
   @ApiProperty({
     minimum: 0,
-    example: 100,
+    example: 10,
   })
   @IsInt()
   @Min(0)
   wholesale_minimum_quantity: number;
 
   @ApiPropertyOptional({
-    example: false,
     default: true,
+    example: true,
   })
   @IsOptional()
   @IsBoolean()

@@ -8,7 +8,7 @@ export class GetProductsDto {
   search?: string;
 
   @ApiPropertyOptional({
-    description: 'Сортування тільки за іменем, ціною та доступною к-стю',
+    description: 'Sort only by name, price and available quantity',
     enum: ['name', 'price', 'available_quantity'],
     default: 'name',
   })
