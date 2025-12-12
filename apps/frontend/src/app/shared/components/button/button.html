@@ -9,6 +9,7 @@
         'button_theme_primary-line': type() === 'primary-line',
     }"
     [disabled]="isDisabled()"
+    [ariaLabel]="label() || icon()"
 >
     @if(label()) {
     <span class="button__label">{{ label() }}</span>
