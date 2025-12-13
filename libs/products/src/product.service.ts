@@ -1,19 +1,19 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Product } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { GetProductsDto } from './dtos/get-products.dto';
+import type { IProductRepository } from './interfaces/product-repository.interface';
+import { PRODUCT_REPOSITORY } from './interfaces/product-repository.interface';
 
 @Injectable()
 export class ProductService {
   constructor(
-    @InjectRepository(Product) private readonly product: Repository<Product>,
+    @Inject(PRODUCT_REPOSITORY)
+    private readonly productRepository: IProductRepository,
   ) {}
 
   async exportCsv() {
-    const products = await this.product.find();
+    const products = await this.productRepository.getAll();
     const headers = [
       'product_id',
       'name',
@@ -31,11 +31,9 @@ export class ProductService {
         try {
           s = JSON.stringify(v);
         } catch {
-          // eslint-disable-next-line @typescript-eslint/no-base-to-string
           s = String(v);
         }
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-base-to-string
         s = String(v);
       }
 
@@ -66,26 +64,11 @@ export class ProductService {
   }
 
   async getList(q: GetProductsDto) {
-    const sortMap = {
-      name: 'p.name',
-      price: 'p.price',
-      available_quantity: 'p.available_quantity',
-    } as const;
-
-    const sortCol = sortMap[q.sort];
-    const order = q.order.toUpperCase() as 'ASC' | 'DESC';
-
-    const query = this.product.createQueryBuilder('p');
-
-    const search = q.search?.trim();
-    if (search) query.where(`p.name ILIKE :search`, { search: `%${search}%` });
-
-    query.orderBy(sortCol, order);
-    return query.getMany();
+    return this.productRepository.findWithFilters(q);
   }
 
   async getById(id: number) {
-    const product = await this.product.findOne({ where: { product_id: id } });
+    const product = await this.productRepository.findById(id);
 
     if (!product) throw new NotFoundException('Product not found.');
 
@@ -93,21 +76,21 @@ export class ProductService {
   }
 
   async create(dto: CreateProductDto) {
-    return this.product.save(this.product.create(dto));
+    return this.productRepository.create(dto);
   }
 
   async update(id: number, attrs: UpdateProductDto) {
-    const product = await this.product.findOne({ where: { product_id: id } });
+    const product = await this.productRepository.findById(id);
     if (!product) throw new NotFoundException('Product not found.');
 
     Object.assign(product, attrs);
 
-    return this.product.save(product);
+    return this.productRepository.update(product);
   }
 
   async remove(id: number) {
-    const product = await this.product.findOne({ where: { product_id: id } });
+    const product = await this.productRepository.findById(id);
     if (!product) throw new NotFoundException('Product not found.');
-    await this.product.remove(product);
+    await this.productRepository.delete(product);
   }
 }

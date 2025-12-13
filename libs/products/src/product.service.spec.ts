@@ -1,8 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { ProductService } from './product.service';
-import { Product } from './entities/product.entity';
+import { PRODUCT_REPOSITORY } from './interfaces/product-repository.interface';
 import { GetProductsDto } from './dtos/get-products.dto';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { UpdateProductDto } from './dtos/update-product.dto';
@@ -10,19 +9,13 @@ import { UpdateProductDto } from './dtos/update-product.dto';
 describe('ProductService', () => {
   let service: ProductService;
 
-  const mockQueryBuilder = {
-    where: jest.fn().mockReturnThis(),
-    orderBy: jest.fn().mockReturnThis(),
-    getMany: jest.fn(),
-  };
-
   const mockProductRepository = {
     create: jest.fn(),
-    save: jest.fn(),
-    find: jest.fn(),
-    findOne: jest.fn(),
-    remove: jest.fn(),
-    createQueryBuilder: jest.fn(() => mockQueryBuilder),
+    update: jest.fn(),
+    getAll: jest.fn(),
+    findById: jest.fn(),
+    delete: jest.fn(),
+    findWithFilters: jest.fn(),
   };
 
   const products = [
@@ -51,7 +44,7 @@ describe('ProductService', () => {
       providers: [
         ProductService,
         {
-          provide: getRepositoryToken(Product),
+          provide: PRODUCT_REPOSITORY,
           useValue: mockProductRepository,
         },
       ],
@@ -90,11 +83,11 @@ describe('ProductService', () => {
         `product_id,name,available_quantity,price,wholesale_price,wholesale_minimum_quantity,is_active\n` +
         `1,Safe=Value,10,"{""currency"":""USD"",""amount"":100}",90,5,yes\n` +
         `2,"Product 2 with special "", chars",,'@200,,[object Object],no`;
-      mockProductRepository.find.mockResolvedValue(dangerousProducts);
+      mockProductRepository.getAll.mockResolvedValue(dangerousProducts);
 
       const result = await service.exportCsv();
 
-      expect(mockProductRepository.find).toHaveBeenCalled();
+      expect(mockProductRepository.getAll).toHaveBeenCalled();
       expect(result).toEqual(expectedCsv);
     });
   });
@@ -109,32 +102,12 @@ describe('ProductService', () => {
       const expectedProducts = products
         .filter((p) => p.name.toLowerCase().includes('product'))
         .sort((a, b) => b.price - a.price);
-      mockQueryBuilder.getMany.mockResolvedValue(expectedProducts);
+      mockProductRepository.findWithFilters.mockResolvedValue(expectedProducts);
 
       const result = await service.getList(dto);
 
-      expect(mockProductRepository.createQueryBuilder).toHaveBeenCalledWith(
-        'p',
-      );
-      expect(mockQueryBuilder.where).toHaveBeenCalledWith(
-        'p.name ILIKE :search',
-        { search: '%product%' },
-      );
-      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('p.price', 'DESC');
+      expect(mockProductRepository.findWithFilters).toHaveBeenCalledWith(dto);
       expect(result).toEqual(expectedProducts);
-    });
-
-    it('should handle query without search', async () => {
-      const dto: GetProductsDto = { sort: 'name', order: 'desc' };
-      const expectedProducts = products.sort((a, b) =>
-        b.name.localeCompare(a.name),
-      );
-      mockQueryBuilder.getMany.mockResolvedValue(expectedProducts);
-
-      await service.getList(dto);
-
-      expect(mockQueryBuilder.where).not.toHaveBeenCalled();
-      expect(mockQueryBuilder.orderBy).toHaveBeenCalledWith('p.name', 'DESC');
     });
   });
 
@@ -142,18 +115,16 @@ describe('ProductService', () => {
     it('should return product by id', async () => {
       const id = 1;
       const product = products.find((p) => p.product_id === id);
-      mockProductRepository.findOne.mockResolvedValue(product);
+      mockProductRepository.findById.mockResolvedValue(product);
 
       const result = await service.getById(id);
 
       expect(result).toEqual(product);
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith({
-        where: { product_id: id },
-      });
+      expect(mockProductRepository.findById).toHaveBeenCalledWith(id);
     });
 
     it('should throw NotFoundException if product not found', async () => {
-      mockProductRepository.findOne.mockResolvedValue(null);
+      mockProductRepository.findById.mockResolvedValue(null);
 
       let thrownError: NotFoundException | undefined;
       try {
@@ -178,13 +149,11 @@ describe('ProductService', () => {
         is_active: true,
       };
       const expectedSaveResult = { ...dto, product_id: products.length + 1 };
-      mockProductRepository.create.mockReturnValue(dto);
-      mockProductRepository.save.mockResolvedValue(expectedSaveResult);
+      mockProductRepository.create.mockResolvedValue(expectedSaveResult);
 
       const result = await service.create(dto);
 
       expect(mockProductRepository.create).toHaveBeenCalledWith(dto);
-      expect(mockProductRepository.save).toHaveBeenCalledWith(dto);
       expect(result).toEqual(expectedSaveResult);
     });
   });
@@ -196,18 +165,16 @@ describe('ProductService', () => {
       const product = products.find((p) => p.product_id === id)!;
       const newName = 'Updated Name';
       const updateDto: UpdateProductDto = { name: newName };
-      mockProductRepository.findOne.mockResolvedValue({ ...product });
-      mockProductRepository.save.mockResolvedValue({
+      mockProductRepository.findById.mockResolvedValue({ ...product });
+      mockProductRepository.update.mockResolvedValue({
         ...product,
         ...updateDto,
       });
 
       const result = await service.update(id, updateDto);
 
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith({
-        where: { product_id: id },
-      });
-      expect(mockProductRepository.save).toHaveBeenCalledWith(
+      expect(mockProductRepository.findById).toHaveBeenCalledWith(id);
+      expect(mockProductRepository.update).toHaveBeenCalledWith(
         expect.objectContaining({
           ...product,
           name: newName,
@@ -218,7 +185,7 @@ describe('ProductService', () => {
     });
 
     it('should throw NotFoundException if product to update not found', async () => {
-      mockProductRepository.findOne.mockResolvedValue(null);
+      mockProductRepository.findById.mockResolvedValue(null);
 
       let thrownError: NotFoundException | undefined;
       try {
@@ -237,19 +204,17 @@ describe('ProductService', () => {
 
     it('should remove existing product', async () => {
       const product = products.find((p) => p.product_id === id)!;
-      mockProductRepository.findOne.mockResolvedValue(product);
-      mockProductRepository.remove.mockResolvedValue(product);
+      mockProductRepository.findById.mockResolvedValue(product);
+      mockProductRepository.delete.mockResolvedValue(undefined);
 
       await service.remove(id);
 
-      expect(mockProductRepository.findOne).toHaveBeenCalledWith({
-        where: { product_id: id },
-      });
-      expect(mockProductRepository.remove).toHaveBeenCalledWith(product);
+      expect(mockProductRepository.findById).toHaveBeenCalledWith(id);
+      expect(mockProductRepository.delete).toHaveBeenCalledWith(product);
     });
 
     it('should throw NotFoundException if product to remove not found', async () => {
-      mockProductRepository.findOne.mockResolvedValue(null);
+      mockProductRepository.findById.mockResolvedValue(null);
 
       let thrownError: NotFoundException | undefined;
       try {

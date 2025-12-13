@@ -10,10 +10,10 @@ import { OrderProduct } from './entities/order-product.entity';
 import { CreateOrderDto } from './dtos/create-order.dto';
 import { EstablishmentService } from '../establishment/establishment.service';
 import { AddOrderProductDto } from './dtos/add-order-product.dto';
-import { ProductService } from '../product/product.service';
+import { ProductService } from '@shared-libs/products';
 import { UpdateOrderProductDto } from './dtos/update-order-product.dto';
 import { UpdateOrderDto } from './dtos/update-order.dto';
-import { Product } from '../product/entities/product.entity';
+import { Product } from '@shared-libs/products';
 
 @Injectable()
 export class OrderService {
